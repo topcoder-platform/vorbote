@@ -1,0 +1,41 @@
+{
+  "name": "tc-event-resthooks",
+  "version": "1.0.0",
+  "description": "Topcoder Event RestHooks",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "lint": "eslint src config test",
+    "test": "mocha test/*.test.js",
+    "client": "node test/sample-client.js"
+  },
+  "author": "TCSCODER",
+  "license": "none",
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "eslint": "^2.8.0",
+    "eslint-config-airbnb-base": "^1.0.1",
+    "eslint-plugin-import": "^1.5.0",
+    "eslint-plugin-mocha": "^5.0.0",
+    "mocha": "^3.5.0",
+    "supertest": "^3.0.0"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.15.2",
+    "co": "^4.6.0",
+    "config": "^1.21.0",
+    "cors": "^2.7.1",
+    "express": "^4.14.0",
+    "get-parameter-names": "^0.3.0",
+    "joi": "^9.0.4",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.5.10",
+    "no-kafka": "^3.2.4",
+    "winston": "^2.2.0"
+  },
+  "engines": {
+    "node": "8.x"
+  }
+}
