@@ -1,5 +1,5 @@
 const config = {
-  API_URL: 'http://localhost:4000/api/v1'
+  API_URL: 'https://vorbote.herokuapp.com/api/v1'
 };
 
 export default config;
