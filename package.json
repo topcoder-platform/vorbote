@@ -7,7 +7,8 @@
     "start": "node src/app.js",
     "lint": "eslint src config test",
     "test": "mocha test/*.test.js",
-    "client": "node test/sample-client.js"
+    "client": "node test/sample-client.js",
+    "postinstall": "cd ui && npm install && npm run build && cd .."
   },
   "author": "TCSCODER",
   "license": "none",
