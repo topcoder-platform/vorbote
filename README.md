@@ -47,7 +47,6 @@ The following parameters can be set in config files or in env variables:
 - use another terminal, go to same directory, start a consumer to view the messages:
   `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic challenge.notification.create --from-beginning`
 
-
 ## Front end UI setup
 
 - the front end UI's build folder content are exposed as public content by the REST Hook app, so you may directly access it
