@@ -55,7 +55,6 @@ The following parameters can be set in config files or in env variables:
   run `npm install`, `npm start`, then access `http://localhost:3000`
 - note that if the front end UI's API_URL config is changed, it must be re-built using `npm run build` in the ui folder
 
-
 ## Local deployment
 - setup Kafka as above
 - start local Mongo db, update the config/default.js MONGODB_URI param to point to a new db
