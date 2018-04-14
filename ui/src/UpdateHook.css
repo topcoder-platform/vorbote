@@ -1,0 +1,12 @@
+.Row {
+  margin: 10px;
+}
+
+.Label {
+  width: 100px;
+  display: inline-block;
+}
+
+input {
+  width: 300px;
+}
