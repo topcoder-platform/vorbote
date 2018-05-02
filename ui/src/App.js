@@ -37,10 +37,15 @@ class App extends Component {
       return ({ token });
     }).catch((e) => {
       let url = `retUrl=${encodeURIComponent(config.APP_URL)}`;
-      url = `${config.TC_AUTH_URL}?${url}`;
+      url = `${config.TC_AUTH_URL}/member?${url}`;
       location.href = url; // eslint-disable-line no-restricted-globals
       return ({});
     });
+  }
+
+  logout() {
+    const url = `${config.TC_AUTH_URL}/#!/logout?retUrl=${encodeURIComponent(config.APP_URL)}`
+    location.href = url; // eslint-disable-line no-restricted-globals
   }
 
   render() {
@@ -59,15 +64,16 @@ class App extends Component {
         <div className="App">
           <header className="App-header">
             <div className="logged-in-user">
-            <span>Welcome, {this.state.currentUser.handle}</span>
+              <p><span>Welcome, {this.state.currentUser.handle}</span></p>
+              <a onClick={this.logout}>Logout</a>
             </div>
             <img src={logo} className="App-logo" alt="logo" />
             <h1 className="App-title">Topcoder Event RestHooks Management</h1>
           </header>
           <div>
             <Route exact path="/" component={RestHooks} />
-            <Route exact path="/addhook" component={AddHook} />
-            <Route exact path="/updatehook/:id" component={UpdateHook} />
+            <Route exact path="/addhook" render={(props) => <AddHook {...props} currentUser={this.state.currentUser} />} />
+            <Route exact path="/updatehook/:id" render={(props) => <UpdateHook {...props} currentUser={this.state.currentUser} />} />
           </div>
         </div>
       </Router>

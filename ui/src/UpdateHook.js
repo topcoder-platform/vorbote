@@ -30,7 +30,7 @@ class UpdateHook extends Component {
       alert('Endpoint can not be empty.');
       return;
     }
-    API.updateHook(this.props.match.params.id, { topic, endpoint }, () => {
+    API.updateHook(this.props.match.params.id, { topic, endpoint, handle: _self.props.currentUser.handle }, () => {
       _self.props.history.push('/');
     });
   }
