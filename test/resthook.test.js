@@ -39,7 +39,7 @@ describe('REST Hook API Tests', () => {
 
   it('create hook', (done) => {
     request.post('/api/v1/hooks')
-      .send({ topic: 'topic', endpoint: 'http://endpoint' })
+      .send({ topic: 'topic', endpoint: 'http://endpoint', handle: 'testuser' })
       .expect(200)
       .end((err, res) => {
         if (err) {
@@ -48,6 +48,7 @@ describe('REST Hook API Tests', () => {
         expect(res.body.id).to.exist; // eslint-disable-line
         expect(res.body.topic).to.equal('topic');
         expect(res.body.endpoint).to.equal('http://endpoint');
+        expect(res.body.handle).to.equal('testuser');
         hookId = res.body.id;
         return done();
       });
@@ -63,13 +64,14 @@ describe('REST Hook API Tests', () => {
         expect(res.body.id).to.equal(hookId);
         expect(res.body.topic).to.equal('topic');
         expect(res.body.endpoint).to.equal('http://endpoint');
+        expect(res.body.handle).to.equal('testuser');
         return done();
       });
   });
 
   it('update hook', (done) => {
     request.put(`/api/v1/hooks/${hookId}`)
-      .send({ topic: 'topic2', endpoint: 'http://endpoint2' })
+      .send({ topic: 'topic2', endpoint: 'http://endpoint2', handle: 'testuser2' })
       .expect(200)
       .end((err, res) => {
         if (err) {
@@ -78,6 +80,7 @@ describe('REST Hook API Tests', () => {
         expect(res.body.id).to.equal(hookId);
         expect(res.body.topic).to.equal('topic2');
         expect(res.body.endpoint).to.equal('http://endpoint2');
+        expect(res.body.handle).to.equal('testuser2');
         return done();
       });
   });
@@ -99,6 +102,7 @@ describe('REST Hook API Tests', () => {
         expect(res.body[0].id).to.equal(hookId);
         expect(res.body[0].topic).to.equal('topic2');
         expect(res.body[0].endpoint).to.equal('http://endpoint2');
+        expect(res.body[0].handle).to.equal('testuser2');
         return done();
       });
   });
@@ -110,7 +114,7 @@ describe('REST Hook API Tests', () => {
 
   it('create hook - invalid data', (done) => {
     request.post('/api/v1/hooks')
-      .send({ topic: 'topic', endpoint: 123 })
+      .send({ topic: 'topic', endpoint: 123, handle: 'test' })
       .expect(400, done);
   });
 
@@ -121,7 +125,7 @@ describe('REST Hook API Tests', () => {
 
   it('update hook - not found', (done) => {
     request.put(`/api/v1/hooks/${hookId}`)
-      .send({ topic: 'topic2', endpoint: 'http://endpoint2' })
+      .send({ topic: 'topic2', endpoint: 'http://endpoint2', handle: 'testuser2' })
       .expect(404, done);
   });
 

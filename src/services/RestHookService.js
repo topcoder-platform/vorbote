@@ -15,6 +15,7 @@ const ConflictError = require('../common/errors').ConflictError;
 const hookSchema = Joi.object().keys({
   topic: Joi.string().required(),
   endpoint: Joi.string().required(),
+  handle: Joi.string().required(),
 }).required();
 
 /**

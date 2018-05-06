@@ -23,7 +23,7 @@ class AddHook extends Component {
       alert('Endpoint can not be empty.');
       return;
     }
-    API.createHook({ topic, endpoint }, () => {
+    API.createHook({ topic, endpoint, handle: _self.props.currentUser.handle }, () => {
       _self.props.history.push('/');
     });
   }
