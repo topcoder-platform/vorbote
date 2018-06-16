@@ -6,7 +6,7 @@ import config from './config/config';
 import RestHooks from './RestHooks';
 import AddHook from './AddHook';
 import UpdateHook from './UpdateHook';
-import { getFreshToken, configureConnector, decodeToken } from 'tc-accounts';
+import { getFreshToken, configureConnector, decodeToken } from './services/tc-auth';
 
 class App extends Component {
   constructor() {

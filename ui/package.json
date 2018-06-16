@@ -7,8 +7,7 @@
     "react-dom": "^16.3.1",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.4",
-    "superagent": "^3.8.2",
-    "tc-accounts": "git+https://github.com/appirio-tech/accounts-app.git#dev"
+    "superagent": "^3.8.2"
   },
   "scripts": {
     "start": "react-scripts start",
