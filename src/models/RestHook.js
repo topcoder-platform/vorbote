@@ -10,6 +10,8 @@ const schema = new Schema({
   topic: { type: String, required: true },
   endpoint: { type: String, required: true },
   handle: { type: String, require: true },
+}, {
+  timestamps: true,
 });
 
 schema.index({ topic: 1 });
