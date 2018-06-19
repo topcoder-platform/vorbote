@@ -37,6 +37,8 @@ class RestHooks extends Component {
               <th>ID</th>
               <th>Topic</th>
               <th>Endpoint</th>
+              <th>Created At</th>
+              <th>Updated At</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -47,6 +49,8 @@ class RestHooks extends Component {
               <td>{hook.id}</td>
               <td>{hook.topic}</td>
               <td>{hook.endpoint}</td>
+              <td>{hook.createdAt}</td>
+              <td>{hook.updatedAt}</td>
               <td>
                 <button onClick={() => { this.props.history.push('/updatehook/' + hook.id) }}>Update</button>
                 <button onClick={() => this.deleteHook(hook.id)}>Delete</button>

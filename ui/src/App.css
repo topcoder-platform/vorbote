@@ -18,6 +18,14 @@
   font-size: 1.5em;
 }
 
+.logged-in-user, .logged-in-user a {
+  float: right;
+  color: white;
+}
+a, button {
+ cursor: pointer;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

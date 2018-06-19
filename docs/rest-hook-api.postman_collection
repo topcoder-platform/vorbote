@@ -1,284 +1,240 @@
 {
-	"id": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-	"name": "rest-hook-api",
-	"description": "",
-	"order": [
-		"2c23bd37-06a8-edaa-ddf7-17d6d4286aab",
-		"464789ba-b934-bafe-d4df-802acd9b5b21",
-		"7eee9c1b-c4e5-a564-062a-5e8762892d4b",
-		"a08fb627-63a6-0db1-e612-e377bdd1f739",
-		"fa6380fc-e5be-d4d8-481f-5d01ec7beb08",
-		"d92c8810-af3e-4b12-8f49-90e643cc3b6e"
-	],
-	"folders": [],
-	"folders_order": [],
-	"timestamp": 1507789221862,
-	"owner": 0,
-	"public": false,
-	"requests": [
+	"info": {
+		"_postman_id": "c1c333ab-6cda-4b41-b5d3-4ad41f08e38f",
+		"name": "rest-hook-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
 		{
-			"id": "2c23bd37-06a8-edaa-ddf7-17d6d4286aab",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{URL}}/hooks",
-			"queryParams": [
-				{
-					"key": "type",
-					"value": "notifications.connect.project.updated",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				},
-				{
-					"key": "read",
-					"value": "false",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				}
-			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1523180011282,
 			"name": "get all hooks",
-			"description": "",
-			"collectionId": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-			"responses": [],
-			"rawModeData": ""
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/hooks?",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"hooks"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		},
 		{
-			"id": "464789ba-b934-bafe-d4df-802acd9b5b21",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{URL}}/hooks",
-			"queryParams": [
-				{
-					"key": "type",
-					"value": "notifications.connect.project.updated",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				},
-				{
-					"key": "read",
-					"value": "false",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				}
-			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1523181085098,
 			"name": "create hook",
-			"description": "",
-			"collectionId": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-			"responses": [],
-			"rawModeData": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\"\n}"
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\"\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/hooks?",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"hooks"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		},
 		{
-			"id": "7eee9c1b-c4e5-a564-062a-5e8762892d4b",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a",
-			"queryParams": [
-				{
-					"key": "type",
-					"value": "notifications.connect.project.updated",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				},
-				{
-					"key": "read",
-					"value": "false",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				}
-			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1523181080012,
 			"name": "update hook",
-			"description": "",
-			"collectionId": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-			"responses": [],
-			"rawModeData": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\"\n}"
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\"\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a?",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"hooks",
+						"5ac9e2218138bb0c9e3b7d5a"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		},
 		{
-			"id": "a08fb627-63a6-0db1-e612-e377bdd1f739",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a",
-			"queryParams": [
-				{
-					"key": "type",
-					"value": "notifications.connect.project.updated",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				},
-				{
-					"key": "read",
-					"value": "false",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				}
-			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1523180202456,
 			"name": "get hook",
-			"description": "",
-			"collectionId": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-			"responses": [],
-			"rawModeData": ""
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a?",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"hooks",
+						"5ac9e2218138bb0c9e3b7d5a"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		},
 		{
-			"id": "d92c8810-af3e-4b12-8f49-90e643cc3b6e",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{CLIENT_URL}}/callback",
-			"queryParams": [
-				{
-					"key": "type",
-					"value": "notifications.connect.project.updated",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				},
-				{
-					"key": "read",
-					"value": "false",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				}
-			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1523189962398,
-			"name": "sample client callback",
-			"description": "",
-			"collectionId": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-			"responses": [],
-			"rawModeData": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"originator\": \"ap-challenge-api\",\n\t\"mime-type\": \"application/json\",\n\t\"timestamp\": \"2018-02-16T00:00:00\",\n\t\"payload\": {\n\t\t\"id\": 123,\n\t\t\"name\": \"name\"\n\t}\n}"
-		},
-		{
-			"id": "fa6380fc-e5be-d4d8-481f-5d01ec7beb08",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a",
-			"queryParams": [
-				{
-					"key": "type",
-					"value": "notifications.connect.project.updated",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				},
-				{
-					"key": "read",
-					"value": "false",
-					"equals": true,
-					"description": "",
-					"enabled": false
-				}
-			],
-			"preRequestScript": null,
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "DELETE",
-			"data": [],
-			"dataMode": "raw",
-			"tests": null,
-			"currentHelper": "normal",
-			"helperAttributes": {},
-			"time": 1523180238460,
 			"name": "delete hook",
-			"description": "",
-			"collectionId": "a1fbf5f1-e4bc-b7a8-e146-7880ff33ce15",
-			"responses": [],
-			"rawModeData": ""
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a?",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"hooks",
+						"5ac9e2218138bb0c9e3b7d5a"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sample client callback",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"originator\": \"ap-challenge-api\",\n\t\"mime-type\": \"application/json\",\n\t\"timestamp\": \"2018-02-16T00:00:00\",\n\t\"payload\": {\n\t\t\"id\": 123,\n\t\t\"name\": \"name\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "{{CLIENT_URL}}/callback?",
+					"host": [
+						"{{CLIENT_URL}}"
+					],
+					"path": [
+						"callback"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

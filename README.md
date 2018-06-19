@@ -1,6 +1,5 @@
 # Topcoder Event RestHooks
 
-
 ## Dependencies
 - nodejs https://nodejs.org/en/ (v8+)
 - MongoDB 3.4
