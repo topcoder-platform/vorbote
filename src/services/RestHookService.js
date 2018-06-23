@@ -102,15 +102,15 @@ function* notifyHooks(message) {
   yield _.map(hooks, (hook) => axios.post(hook.endpoint, message).catch((err) => logger.error(err)));
 }
 
-notifyHooks.schema = {
-  message: Joi.object().keys({
-    topic: Joi.string().required(),
-    originator: Joi.string().required(),
-    timestamp: Joi.string().required(),
-    'mime-type': Joi.string().required(),
-    payload: Joi.any(),
-  }).required(),
-};
+// notifyHooks.schema = {
+//   message: Joi.object().keys({
+//     topic: Joi.string().required(),
+//     originator: Joi.string().required(),
+//     timestamp: Joi.string().required(),
+//     'mime-type': Joi.string().required(),
+//     payload: Joi.any(),
+//   }).required(),
+// };
 
 // Exports
 module.exports = {
