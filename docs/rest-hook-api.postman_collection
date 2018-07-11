@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "c1c333ab-6cda-4b41-b5d3-4ad41f08e38f",
+		"_postman_id": "803e4ee0-718c-4745-afb1-20d62a6de50d",
 		"name": "rest-hook-api",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -20,7 +20,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks?",
+					"raw": "{{URL}}/hooks",
 					"host": [
 						"{{URL}}"
 					],
@@ -55,10 +55,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\"\n}"
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
 				},
 				"url": {
-					"raw": "{{URL}}/hooks?",
+					"raw": "{{URL}}/hooks",
 					"host": [
 						"{{URL}}"
 					],
@@ -93,16 +93,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\"\n}"
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a?",
+					"raw": "{{URL}}/hooks/5b4018081a4e540b3fe76bf2",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5ac9e2218138bb0c9e3b7d5a"
+						"5b4018081a4e540b3fe76bf2"
 					],
 					"query": [
 						{
@@ -135,13 +135,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a?",
+					"raw": "{{URL}}/hooks/5b4014771a4e540b3fe76bf1",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5ac9e2218138bb0c9e3b7d5a"
+						"5b4014771a4e540b3fe76bf1"
 					],
 					"query": [
 						{
@@ -174,13 +174,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5ac9e2218138bb0c9e3b7d5a?",
+					"raw": "{{URL}}/hooks/5b4014771a4e540b3fe76bf1",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5ac9e2218138bb0c9e3b7d5a"
+						"5b4014771a4e540b3fe76bf1"
 					],
 					"query": [
 						{

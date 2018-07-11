@@ -16,6 +16,7 @@ The following parameters can be set in config file:
 - TC_AUTH_URL: th url of Topcoder auth form,
 - ACCOUNTS_APP_CONNECTOR: the url to TC account connector,
 - APP_URL: URL of app
+- RESTHOOK_FILTER_MAX_LENGTH: the max length for REST hook filter code
 
 Run the application as http://local.topcoder-dev.com:3000
 

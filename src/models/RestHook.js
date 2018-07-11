@@ -10,6 +10,7 @@ const schema = new Schema({
   topic: { type: String, required: true },
   endpoint: { type: String, required: true },
   handle: { type: String, require: true },
+  filter: String,
 }, {
   timestamps: true,
 });
