@@ -19,6 +19,7 @@
     "eslint-plugin-import": "^1.5.0",
     "eslint-plugin-mocha": "^5.0.0",
     "mocha": "^3.5.0",
+    "nyc": "^12.0.2",
     "supertest": "^3.0.0"
   },
   "dependencies": {
@@ -34,6 +35,7 @@
     "lodash": "^4.17.4",
     "mongoose": "^4.5.10",
     "no-kafka": "^3.2.4",
+    "sandbox.js": "^2.0.2",
     "winston": "^2.2.0"
   },
   "engines": {

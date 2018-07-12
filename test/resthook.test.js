@@ -39,7 +39,7 @@ describe('REST Hook API Tests', () => {
 
   it('create hook', (done) => {
     request.post('/api/v1/hooks')
-      .send({ topic: 'topic', endpoint: 'http://endpoint', handle: 'testuser' })
+      .send({ topic: 'topic', endpoint: 'http://endpoint', handle: 'testuser', filter: '1+4 > 3' })
       .expect(200)
       .end((err, res) => {
         if (err) {
@@ -49,6 +49,7 @@ describe('REST Hook API Tests', () => {
         expect(res.body.topic).to.equal('topic');
         expect(res.body.endpoint).to.equal('http://endpoint');
         expect(res.body.handle).to.equal('testuser');
+        expect(res.body.filter).to.equal('1+4 > 3');
         hookId = res.body.id;
         return done();
       });
@@ -65,13 +66,14 @@ describe('REST Hook API Tests', () => {
         expect(res.body.topic).to.equal('topic');
         expect(res.body.endpoint).to.equal('http://endpoint');
         expect(res.body.handle).to.equal('testuser');
+        expect(res.body.filter).to.equal('1+4 > 3');
         return done();
       });
   });
 
   it('update hook', (done) => {
     request.put(`/api/v1/hooks/${hookId}`)
-      .send({ topic: 'topic2', endpoint: 'http://endpoint2', handle: 'testuser2' })
+      .send({ topic: 'topic2', endpoint: 'http://endpoint2', handle: 'testuser2', filter: 'true' })
       .expect(200)
       .end((err, res) => {
         if (err) {
@@ -81,6 +83,7 @@ describe('REST Hook API Tests', () => {
         expect(res.body.topic).to.equal('topic2');
         expect(res.body.endpoint).to.equal('http://endpoint2');
         expect(res.body.handle).to.equal('testuser2');
+        expect(res.body.filter).to.equal('true');
         return done();
       });
   });
@@ -103,6 +106,7 @@ describe('REST Hook API Tests', () => {
         expect(res.body[0].topic).to.equal('topic2');
         expect(res.body[0].endpoint).to.equal('http://endpoint2');
         expect(res.body[0].handle).to.equal('testuser2');
+        expect(res.body[0].filter).to.equal('true');
         return done();
       });
   });
