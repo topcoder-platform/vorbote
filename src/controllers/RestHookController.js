@@ -11,7 +11,10 @@ const RestHookService = require('../services/RestHookService');
  * @param res the response
  */
 function* getAllHooks(req, res) {
-  res.json(yield RestHookService.getAllHooks());
+  if (!req.user.isAdmin) {
+    req.query.handle = req.user.handle;
+  }
+  res.json(yield RestHookService.getAllHooks(req.query));
 }
 
 /**
@@ -20,7 +23,7 @@ function* getAllHooks(req, res) {
  * @param res the response
  */
 function* createHook(req, res) {
-  res.json(yield RestHookService.createHook(req.body));
+  res.json(yield RestHookService.createHook(req.body, req.user));
 }
 
 /**
@@ -29,7 +32,7 @@ function* createHook(req, res) {
  * @param res the response
  */
 function* getHook(req, res) {
-  res.json(yield RestHookService.getHook(req.params.id));
+  res.json(yield RestHookService.getHook(req.params.id, req.user));
 }
 
 /**
@@ -38,7 +41,7 @@ function* getHook(req, res) {
  * @param res the response
  */
 function* updateHook(req, res) {
-  res.json(yield RestHookService.updateHook(req.params.id, req.body));
+  res.json(yield RestHookService.updateHook(req.params.id, req.body, req.user));
 }
 
 /**
@@ -47,7 +50,7 @@ function* updateHook(req, res) {
  * @param res the response
  */
 function* deleteHook(req, res) {
-  yield RestHookService.deleteHook(req.params.id);
+  yield RestHookService.deleteHook(req.params.id, req.user);
   res.status(200).end();
 }
 

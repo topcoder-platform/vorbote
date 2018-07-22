@@ -12,62 +12,107 @@ const RestHook = require('../models').RestHook;
 const helper = require('../common/helper');
 const logger = require('../common/logger');
 const ConflictError = require('../common/errors').ConflictError;
+const ForbiddenError = require('../common/errors').ForbiddenError;
 const sandbox = require('sandbox.js');
+const RoleTopicService = require('./RoleTopicService');
 
 const hookSchema = Joi.object().keys({
   topic: Joi.string().required(),
   endpoint: Joi.string().required(),
-  handle: Joi.string().required(),
   filter: Joi.string().max(Number(config.RESTHOOK_FILTER_MAX_LENGTH)).allow(''),
 }).required();
 
 /**
  * Get all hooks.
- * @returns {Array} all hooks
+ * @param {Object} query the query parameters
+ * @returns {Object} hooks result
  */
-function* getAllHooks() {
-  return yield RestHook.find();
+function* getAllHooks(query) {
+  const filter = {};
+  if (query.handle) {
+    filter.handle = query.handle;
+  }
+  const total = yield RestHook.count(filter);
+  const hooks = yield RestHook.find(filter).sort('_id').skip(query.offset).limit(query.limit);
+  return { total, offset: query.offset, limit: query.limit, hooks };
+}
+
+getAllHooks.schema = {
+  query: Joi.object().keys({
+    handle: Joi.string(),
+    offset: Joi.number().integer().min(0).default(0),
+    limit: Joi.number().integer().min(1).default(10),
+  }),
+};
+
+/**
+ * Validate whether user can access the topic.
+ * @param {Object} user the current user
+ * @param {String} topic the Kafka topic
+ */
+function* validateUserTopic(user, topic) {
+  if (user.isAdmin) {
+    return;
+  }
+  const topics = yield RoleTopicService.getTopics(user.roles);
+  if (_.indexOf(topics, topic) < 0) {
+    throw new ForbiddenError(`You can not access topic: ${topic}.`);
+  }
 }
 
 /**
  * Create hook.
  * @param {Object} data the request data
+ * @param {Object} user the current user
  * @returns {Object} the created hook
  */
-function* createHook(data) {
+function* createHook(data, user) {
+  yield validateUserTopic(user, data.topic);
+
   if (data.filter && data.filter.trim().length === 0) data.filter = null;
 
   const hook = yield RestHook.findOne({ topic: data.topic, endpoint: data.endpoint });
   if (hook) {
     throw new ConflictError('The hook is already defined.');
   }
+  data.handle = user.handle;
   return yield RestHook.create(data);
 }
 
 createHook.schema = {
   data: hookSchema,
+  user: Joi.object().required(),
 };
 
 /**
  * Get hook.
  * @param {String} id the hook id
+ * @param {Object} user the current user
  * @returns {Object} the hook
  */
-function* getHook(id) {
-  return yield helper.ensureExists(RestHook, id);
+function* getHook(id, user) {
+  const hook = yield helper.ensureExists(RestHook, id);
+  if (!user.isAdmin && hook.handle !== user.handle) {
+    throw new ForbiddenError('You can not access other user\'s hook.');
+  }
+  return hook;
 }
 
 getHook.schema = {
   id: Joi.string().required(),
+  user: Joi.object().required(),
 };
 
 /**
  * Update hook.
  * @param {String} id the hook id
  * @param {Object} data the request data
+ * @param {Object} user the current user
  * @returns {Object} the updated hook
  */
-function* updateHook(id, data) {
+function* updateHook(id, data, user) {
+  yield validateUserTopic(user, data.topic);
+
   if (data.filter && data.filter.trim().length === 0) data.filter = null;
 
   const hk = yield RestHook.findOne({ topic: data.topic, endpoint: data.endpoint });
@@ -76,6 +121,10 @@ function* updateHook(id, data) {
   }
 
   const hook = yield helper.ensureExists(RestHook, id);
+  if (!user.isAdmin && hook.handle !== user.handle) {
+    throw new ForbiddenError('You can not access other user\'s hook.');
+  }
+  data.handle = user.handle;
   _.assignIn(hook, data);
   return yield hook.save();
 }
@@ -83,19 +132,25 @@ function* updateHook(id, data) {
 updateHook.schema = {
   id: Joi.string().required(),
   data: hookSchema,
+  user: Joi.object().required(),
 };
 
 /**
  * Delete hook.
  * @param {String} id the hook id
+ * @param {Object} user the current user
  */
-function* deleteHook(id) {
+function* deleteHook(id, user) {
   const hook = yield helper.ensureExists(RestHook, id);
+  if (!user.isAdmin && hook.handle !== user.handle) {
+    throw new ForbiddenError('You can not access other user\'s hook.');
+  }
   yield hook.remove();
 }
 
 deleteHook.schema = {
   id: Joi.string().required(),
+  user: Joi.object().required(),
 };
 
 /**
