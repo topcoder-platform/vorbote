@@ -37,6 +37,7 @@ class RestHooks extends Component {
               <th>ID</th>
               <th>Topic</th>
               <th>Endpoint</th>
+              <th>Custom Filter Logic</th>
               <th>Created At</th>
               <th>Updated At</th>
               <th>Actions</th>
@@ -49,6 +50,7 @@ class RestHooks extends Component {
               <td>{hook.id}</td>
               <td>{hook.topic}</td>
               <td>{hook.endpoint}</td>
+              <td>{hook.filter}</td>
               <td>{hook.createdAt}</td>
               <td>{hook.updatedAt}</td>
               <td>

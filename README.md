@@ -11,6 +11,7 @@ The following parameters can be set in config files or in env variables:
 - LOG_LEVEL: the log level
 - PORT: the server port
 - MONGODB_URI: the Mongo DB URI
+- RESTHOOK_FILTER_MAX_LENGTH: the max length for REST hook filter code
 - KAFKA_URL: comma separated Kafka hosts
 - KAFKA_CLIENT_CERT: Kafka connection certificate, optional;
     if not provided, then SSL connection is not used, direct insecure connection is used;
@@ -50,9 +51,7 @@ The following parameters can be set in config files or in env variables:
 ## Front end UI setup
 
 - the front end UI's build folder content are exposed as public content by the REST Hook app, so you may directly access it
-  via http://localhost:4000
-- or if you want to use it for development, then you may go to ui folder:
-  run `npm install`, `npm start`, then access `http://localhost:3000`
+  via http://localhost:3000
 - note that if the front end UI's API_URL config is changed, it must be re-built using `npm run build` in the ui folder
 
 
@@ -63,7 +62,7 @@ The following parameters can be set in config files or in env variables:
 - run code lint check `npm run lint`
 - run test `npm run test`
 - start REST Hook app `npm start`,
-  the app is running at `http://localhost:4000`,
+  the app is running at `http://localhost:3000`,
   it also starts Kafka consumer to listen for events and send to registered corresponding hooks
 - use another terminal to start sample client `npm run client`
   the sample client is running at `http://localhost:5000`
@@ -74,8 +73,14 @@ The following parameters can be set in config files or in env variables:
 
 - setup stuff following above deployment
 - use the Postman collection and environment in docs folder to test the APIs
-- use the UI or Postman to add a hook, topic is `challenge.notification.create`,
-  endpoint is `http://localhost:5000/callback`
-- use the kafka-console-producer to generate some messages in Kafka,
-  then watch the sample client console, it should got some messages
+- use the UI or Postman to add a hook,
+  topic is `challenge.notification.create`,
+  endpoint is `http://localhost:5000/callback`,
+  filter is a JavaScript code that can reference `message` object,
+  e.g. `message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4`
+- use the kafka-console-producer to generate some messages in Kafka, see above for `Local Kafka setup` section
+  for sample messages, then watch the sample client console, it should got some messages
+- update the hook's filter code to `message.originator == 'not-found'`,
+  use the kafka-console-producer to generate messages in Kafka again,
+  then watch the sample client console, it should got NO new messages because the filter is evaluated to false
 
