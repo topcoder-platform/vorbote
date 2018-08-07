@@ -23,6 +23,7 @@
     "supertest": "^3.0.0"
   },
   "dependencies": {
+    "atob": "^2.1.1",
     "axios": "^0.17.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.15.2",

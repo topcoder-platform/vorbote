@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "803e4ee0-718c-4745-afb1-20d62a6de50d",
+		"_postman_id": "82f4c3d6-4081-409c-8b92-8dba516aec72",
 		"name": "rest-hook-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -13,6 +13,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
 					}
 				],
 				"body": {
@@ -20,7 +24,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks",
+					"raw": "{{URL}}/hooks?offset=0&limit=10",
 					"host": [
 						"{{URL}}"
 					],
@@ -29,14 +33,12 @@
 					],
 					"query": [
 						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
+							"key": "offset",
+							"value": "0"
 						},
 						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
+							"key": "limit",
+							"value": "10"
 						}
 					]
 				}
@@ -51,14 +53,18 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
 				},
 				"url": {
-					"raw": "{{URL}}/hooks",
+					"raw": "{{URL}}/hooks?",
 					"host": [
 						"{{URL}}"
 					],
@@ -89,20 +95,24 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"handle\": \"veshu\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
+					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5b4018081a4e540b3fe76bf2",
+					"raw": "{{URL}}/hooks/5b4b59c23cb03613cab6b442?",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5b4018081a4e540b3fe76bf2"
+						"5b4b59c23cb03613cab6b442"
 					],
 					"query": [
 						{
@@ -128,6 +138,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
 					}
 				],
 				"body": {
@@ -135,13 +149,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5b4014771a4e540b3fe76bf1",
+					"raw": "{{URL}}/hooks/5b4b59c23cb03613cab6b442?",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5b4014771a4e540b3fe76bf1"
+						"5b4b59c23cb03613cab6b442"
 					],
 					"query": [
 						{
@@ -167,6 +181,10 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
 					}
 				],
 				"body": {
@@ -174,13 +192,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5b4014771a4e540b3fe76bf1",
+					"raw": "{{URL}}/hooks/5b4b59c23cb03613cab6b442?",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5b4014771a4e540b3fe76bf1"
+						"5b4b59c23cb03613cab6b442"
 					],
 					"query": [
 						{
@@ -219,6 +237,191 @@
 					],
 					"path": [
 						"callback"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get topics",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/topics",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"topics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get topics - non admin",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{NON_ADMIN_TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/topics",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"topics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get role topics",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/roletopics?offset=0&limit=10",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"roletopics"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create role topic",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"role\": \"copilot\",\n\t\"topic\": \"challenge.notification.create\"\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/roletopics",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"roletopics"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "notifications.connect.project.updated",
+							"disabled": true
+						},
+						{
+							"key": "read",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete role topic",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/roletopics/5b4b59f23cb03613cab6b443",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"roletopics",
+						"5b4b59f23cb03613cab6b443"
 					],
 					"query": [
 						{

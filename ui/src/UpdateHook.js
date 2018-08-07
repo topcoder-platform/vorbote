@@ -9,7 +9,8 @@ class UpdateHook extends Component {
     this.state = {
       topic: '',
       endpoint: '',
-      filter: ''
+      filter: '',
+      topics: []
     };
     this.updateHook = this.updateHook.bind(this);
   }
@@ -19,33 +20,43 @@ class UpdateHook extends Component {
     API.getHook(this.props.match.params.id, (hook) => {
       _self.setState(hook);
     });
+    API.getTopics((tps) => {
+      _self.setState({ topics: tps });
+    });
   }
 
   updateHook() {
     const _self = this;
     const { topic, endpoint, filter } = this.state;
     if (!topic || topic.trim().length === 0) {
-      alert('Topic can not be empty.');
+      alert('Topic is not selected.');
       return;
     }
     if (!endpoint || endpoint.trim().length === 0) {
       alert('Endpoint can not be empty.');
       return;
     }
-    API.updateHook(this.props.match.params.id, { topic, endpoint, filter, handle: _self.props.currentUser.handle }, () => {
+    API.updateHook(this.props.match.params.id, { topic, endpoint, filter }, () => {
       _self.props.history.push('/');
     });
   }
 
   render() {
+    const { topics } = this.state;
     return (
       <div>
         <div className="Row">
           <div className="Label">ID:</div> { this.props.match.params.id }
         </div>
         <div className="Row">
-          <div className="Label">Topic:</div> <input value={this.state.topic}
-            onChange={ (e) => this.setState({ topic: e.target.value }) } />
+          <div className="Label">Topic:</div> <select value={this.state.topic}
+            onChange={ (e) => this.setState({ topic: e.target.value }) }>
+              <option value="">Select Topic</option>
+              { topics.map((tp, index) => (
+                  <option key={index}>{tp}</option>
+                )) }
+              }
+            </select>
         </div>
         <div className="Row">
           <div className="Label">Endpoint:</div> <input value={this.state.endpoint}
