@@ -6,6 +6,7 @@ import config from './config/config';
 import RestHooks from './RestHooks';
 import AddHook from './AddHook';
 import UpdateHook from './UpdateHook';
+import RoleTopics from './RoleTopics';
 import { getFreshToken, configureConnector, decodeToken } from './services/tc-auth';
 
 class App extends Component {
@@ -28,10 +29,13 @@ class App extends Component {
 
   authenticate() {
     return getFreshToken().then((token) => {
-      const name = decodeToken(token);
+      // console.log(`current user token: ${token}`);
+      sessionStorage.setItem('token', token);
+      const user = decodeToken(token);
+      user.isAdmin = user.roles && user.roles.indexOf(config.TC_ADMIN_ROLE) >= 0;
       this.setState({
         tokenV3: token,
-        currentUser: name,
+        currentUser: user,
         isLoggedIn: true,
       });
       return ({ token });
@@ -71,9 +75,10 @@ class App extends Component {
             <h1 className="App-title">Topcoder Event RestHooks Management</h1>
           </header>
           <div>
-            <Route exact path="/" component={RestHooks} />
+            <Route exact path="/" render={(props) => <RestHooks {...props} currentUser={this.state.currentUser} />} />
             <Route exact path="/addhook" render={(props) => <AddHook {...props} currentUser={this.state.currentUser} />} />
             <Route exact path="/updatehook/:id" render={(props) => <UpdateHook {...props} currentUser={this.state.currentUser} />} />
+            <Route exact path="/roletopics" render={(props) => <RoleTopics {...props} currentUser={this.state.currentUser} />} />
           </div>
         </div>
       </Router>

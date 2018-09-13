@@ -25,4 +25,29 @@ module.exports = {
       method: 'deleteHook',
     },
   },
+  '/topics': {
+    get: {
+      controller: 'RoleTopicController',
+      method: 'getTopics',
+    },
+  },
+  '/roletopics': {
+    get: {
+      controller: 'RoleTopicController',
+      method: 'getRoleTopics',
+      admin: true,
+    },
+    post: {
+      controller: 'RoleTopicController',
+      method: 'create',
+      admin: true,
+    },
+  },
+  '/roletopics/:id': {
+    delete: {
+      controller: 'RoleTopicController',
+      method: 'remove',
+      admin: true,
+    },
+  },
 };

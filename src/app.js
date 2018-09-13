@@ -12,14 +12,20 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const helper = require('./common/helper');
 const logger = require('./common/logger');
+const errors = require('./common/errors');
 const Kafka = require('no-kafka');
 const co = require('co');
 const RestHookService = require('./services/RestHookService');
+const tcAuth = require('./tc-auth');
+
+let currentConsumer = null;
+let currentTopics = [];
 
 /**
  * Start Kafka consumer.
  */
 function startKafkaConsumer() {
+  logger.info('Start Kafka consumer.');
   // create consumer
   const options = { connectionString: config.KAFKA_URL };
   if (config.KAFKA_CLIENT_CERT && config.KAFKA_CLIENT_CERT_KEY) {
@@ -47,15 +53,24 @@ function startKafkaConsumer() {
       .catch((err) => logger.error(err));
   });
 
+  const topics = [];
   consumer
     .init()
     // consume all topics
     .then(() => _.each(_.keys(consumer.client.topicMetadata), (tp) => {
       // ignore Kafka system topics
       if (!tp.startsWith('__')) {
+        topics.push(tp);
         consumer.subscribe(tp, { time: Kafka.LATEST_OFFSET }, dataHandler);
       }
     }))
+    // replace current consumer and topics
+    .then(() => {
+      if (currentConsumer) currentConsumer.end();
+      currentConsumer = consumer;
+      currentTopics = topics;
+      currentTopics.sort();
+    })
     .catch((err) => logger.error(err));
 }
 
@@ -71,6 +86,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const apiRouter = express.Router();
 
+const authMiddleware = (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (!token) {
+    return next(new errors.UnauthorizedError('Authentication required.'));
+  }
+  try {
+    req.user = tcAuth.decodeToken(token);
+  } catch (err) {
+    logger.error('Failed to decode JWT token.');
+    logger.error(err);
+    return next(new errors.UnauthorizedError('Authentication failed.'));
+  }
+  req.user.isAdmin = req.user.roles && _.indexOf(req.user.roles, config.TC_ADMIN_ROLE) >= 0;
+  next();
+};
+
 // load all routes
 _.each(require('./routes'), (verbs, url) => {
   _.each(verbs, (def, verb) => {
@@ -81,8 +115,26 @@ _.each(require('./routes'), (verbs, url) => {
     }
     actions.push((req, res, next) => {
       req.signature = `${def.controller}#${def.method}`;
+      req.topics = currentTopics;
       next();
     });
+    if (!def.public) {
+      actions.push(authMiddleware);
+      actions.push((req, res, next) => {
+        if (!req.user || !req.user.handle || !req.user.roles || req.user.roles.length === 0) {
+          return next(new errors.UnauthorizedError('Authentication failed.'));
+        }
+        next();
+      });
+      if (def.admin) {
+        actions.push((req, res, next) => {
+          if (!req.user.isAdmin) {
+            return next(new errors.ForbiddenError('Only admin can access this API.'));
+          }
+          next();
+        });
+      }
+    }
     actions.push(method);
     apiRouter[verb](url, helper.autoWrapExpress(actions));
   });
@@ -120,6 +172,8 @@ if (!module.parent) {
   });
 
   startKafkaConsumer();
+  // refresh consumer periodically
+  setInterval(startKafkaConsumer, Number(config.REFRESH_KAFKA_CONSUMER_PERIOD_MINUTE) * 60000);
 } else {
   module.exports = app;
 }

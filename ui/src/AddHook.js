@@ -9,33 +9,48 @@ class AddHook extends Component {
     this.state = {
       topic: '',
       endpoint: '',
-      filter: ''
+      filter: '',
+      topics: []
     };
     this.addHook = this.addHook.bind(this);
+  }
+
+  componentDidMount() {
+    const _self = this;
+    API.getTopics((tps) => {
+      _self.setState({ topics: tps });
+    });
   }
 
   addHook() {
     const _self = this;
     const { topic, endpoint, filter } = this.state;
     if (!topic || topic.trim().length === 0) {
-      alert('Topic can not be empty.');
+      alert('Topic is not selected.');
       return;
     }
     if (!endpoint || endpoint.trim().length === 0) {
       alert('Endpoint can not be empty.');
       return;
     }
-    API.createHook({ topic, endpoint, filter, handle: _self.props.currentUser.handle }, () => {
+    API.createHook({ topic, endpoint, filter }, () => {
       _self.props.history.push('/');
     });
   }
 
   render() {
+    const { topics } = this.state;
     return (
       <div>
         <div className="Row">
-          <div className="Label">Topic:</div> <input value={this.state.topic}
-            onChange={ (e) => this.setState({ topic: e.target.value }) } />
+          <div className="Label">Topic:</div> <select
+            onChange={ (e) => this.setState({ topic: e.target.value }) }>
+              <option value="">Select Topic</option>
+              { topics.map((tp, index) => (
+                  <option key={index}>{tp}</option>
+                )) }
+              }
+            </select>
         </div>
         <div className="Row">
           <div className="Label">Endpoint:</div> <input value={this.state.endpoint}
