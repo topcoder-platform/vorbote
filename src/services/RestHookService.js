@@ -16,11 +16,15 @@ const ForbiddenError = require('../common/errors').ForbiddenError;
 const sandbox = require('sandbox.js');
 const RoleTopicService = require('./RoleTopicService');
 
-const hookSchema = Joi.object().keys({
-  topic: Joi.string().required(),
-  endpoint: Joi.string().required(),
-  filter: Joi.string().max(Number(config.RESTHOOK_FILTER_MAX_LENGTH)).allow(''),
-}).required();
+const hookSchema = Joi.object()
+  .keys({
+    topic: Joi.string().required(),
+    endpoint: Joi.string().required(),
+    filter: Joi.string()
+      .max(Number(config.RESTHOOK_FILTER_MAX_LENGTH))
+      .allow('')
+  })
+  .required();
 
 /**
  * Get all hooks.
@@ -33,16 +37,25 @@ function* getAllHooks(query) {
     filter.handle = query.handle;
   }
   const total = yield RestHook.count(filter);
-  const hooks = yield RestHook.find(filter).sort('_id').skip(query.offset).limit(query.limit);
+  const hooks = yield RestHook.find(filter)
+    .sort('_id')
+    .skip(query.offset)
+    .limit(query.limit);
   return { total, offset: query.offset, limit: query.limit, hooks };
 }
 
 getAllHooks.schema = {
   query: Joi.object().keys({
     handle: Joi.string(),
-    offset: Joi.number().integer().min(0).default(0),
-    limit: Joi.number().integer().min(1).default(10),
-  }),
+    offset: Joi.number()
+      .integer()
+      .min(0)
+      .default(0),
+    limit: Joi.number()
+      .integer()
+      .min(1)
+      .default(10)
+  })
 };
 
 /**
@@ -67,21 +80,28 @@ function* validateUserTopic(user, topic) {
  * @returns {Object} the created hook
  */
 function* createHook(data, user) {
+  console.log(data);
+  console.log(user);
   yield validateUserTopic(user, data.topic);
 
   if (data.filter && data.filter.trim().length === 0) data.filter = null;
 
-  const hook = yield RestHook.findOne({ topic: data.topic, endpoint: data.endpoint });
+  const hook = yield RestHook.findOne({
+    topic: data.topic,
+    endpoint: data.endpoint
+  });
   if (hook) {
     throw new ConflictError('The hook is already defined.');
   }
   data.handle = user.handle;
+
+  console.log(data);
   return yield RestHook.create(data);
 }
 
 createHook.schema = {
   data: hookSchema,
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -93,14 +113,14 @@ createHook.schema = {
 function* getHook(id, user) {
   const hook = yield helper.ensureExists(RestHook, id);
   if (!user.isAdmin && hook.handle !== user.handle) {
-    throw new ForbiddenError('You can not access other user\'s hook.');
+    throw new ForbiddenError("You can not access other user's hook.");
   }
   return hook;
 }
 
 getHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -115,14 +135,17 @@ function* updateHook(id, data, user) {
 
   if (data.filter && data.filter.trim().length === 0) data.filter = null;
 
-  const hk = yield RestHook.findOne({ topic: data.topic, endpoint: data.endpoint });
+  const hk = yield RestHook.findOne({
+    topic: data.topic,
+    endpoint: data.endpoint
+  });
   if (hk && String(hk._id) !== id) {
     throw new ConflictError('The hook is already defined.');
   }
 
   const hook = yield helper.ensureExists(RestHook, id);
   if (!user.isAdmin && hook.handle !== user.handle) {
-    throw new ForbiddenError('You can not access other user\'s hook.');
+    throw new ForbiddenError("You can not access other user's hook.");
   }
   data.handle = user.handle;
   _.assignIn(hook, data);
@@ -132,7 +155,7 @@ function* updateHook(id, data, user) {
 updateHook.schema = {
   id: Joi.string().required(),
   data: hookSchema,
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -143,14 +166,14 @@ updateHook.schema = {
 function* deleteHook(id, user) {
   const hook = yield helper.ensureExists(RestHook, id);
   if (!user.isAdmin && hook.handle !== user.handle) {
-    throw new ForbiddenError('You can not access other user\'s hook.');
+    throw new ForbiddenError("You can not access other user's hook.");
   }
   yield hook.remove();
 }
 
 deleteHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -185,8 +208,11 @@ function* notifyHooks(message) {
   // find hooks of message topic
   const hooks = yield RestHook.find({ topic: message.topic });
   // notify each hook in parallel
-  yield _.map(hooks, (hook) => (filterHook(hook, message) ?
-    axios.post(hook.endpoint, message).catch((err) => logger.error(err)) : null));
+  yield _.map(hooks, hook =>
+    filterHook(hook, message)
+      ? axios.post(hook.endpoint, message).catch(err => logger.error(err))
+      : null
+  );
 }
 
 // notifyHooks.schema = {
@@ -206,5 +232,5 @@ module.exports = {
   getHook,
   updateHook,
   deleteHook,
-  notifyHooks,
+  notifyHooks
 };
