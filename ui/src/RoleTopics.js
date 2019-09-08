@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import './RoleTopics.css';
+import moment from 'moment';
+
+import styles from './RoleTopics.css';
 import API from './services/API';
 import config from './config/config';
+import IconDelete from './assets/images/icon-delete.svg';
 
 const pageSize = Number(config.PAGE_SIZE);
 
@@ -12,21 +15,13 @@ class RoleTopics extends Component {
       items: [],
       page: 1,
       total: 0,
-      role: '',
-      topic: '',
-      topics: []
     };
     this.deleteRoleTopic = this.deleteRoleTopic.bind(this);
-    this.addRoleTopic = this.addRoleTopic.bind(this);
     this.browsePage = this.browsePage.bind(this);
   }
 
   componentDidMount() {
     this.browsePage(1);
-    const _self = this;
-    API.getTopics((tps) => {
-      _self.setState({ topics: tps });
-    });
   }
 
   browsePage(p) {
@@ -43,84 +38,99 @@ class RoleTopics extends Component {
     });
   }
 
-  addRoleTopic() {
-    const _self = this;
-    const { role, topic } = this.state;
-    if (!role || role.trim().length === 0) {
-      alert('Role can not be empty.');
-      return;
-    }
-    if (!topic || topic.trim().length === 0) {
-      alert('Topic is not selected.');
-      return;
-    }
-    API.createRoleTopic({ role, topic }, () => {
-      _self.browsePage(_self.state.page);
-    });
-  }
-
   render() {
     if (!this.props.currentUser.isAdmin) return null;
 
-    const { items, page, total, topics } = this.state;
+    const { items, page, total } = this.state;
     let pageCount = Math.ceil(total / pageSize);
     if (pageCount < 1) pageCount = 1;
     const pages = [];
     for (let i = 1; i <= pageCount; i += 1) pages.push(i);
 
     return (
-      <div>
-        <table className="RoleTopicsTable">
-          <thead>
+      <div className="container">
+        <div className="columns">
+          <div className="column">
+            <h5 className="is-size-5 has-text-grey-light">Manage role topics</h5>
+          </div>
+        </div>
+        <table className="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+          <thead className="thead">
             <tr>
-              <th>ID</th>
-              <th>Role</th>
-              <th>Topic</th>
-              <th>Created At</th>
-              <th>Action</th>
+              <th className="has-text-centered">ID</th>
+              <th className="has-text-centered">ROLE</th>
+              <th className="has-text-centered">TOPIC</th>
+              <th className="has-text-centered">CREATED AT</th>
+              <th className="has-text-centered">ACTION</th>
             </tr>
           </thead>
-          <tbody>
-
+          <tbody className="tbody">
             { items.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.role}</td>
-              <td>{item.topic}</td>
-              <td>{item.createdAt}</td>
-              <td>
-                <button onClick={() => this.deleteRoleTopic(item.id)}>Delete</button>
-              </td>
-            </tr>
-              )) }
+              <tr key={item.id}>
+                <td className="has-text-centered">{item.id}</td>
+                <td className="has-text-centered word-break">{item.role}</td>
+                <td><span className="tag is-dark">{item.topic}</span></td>
+                <td className="has-text-centered">{moment(item.createdAt).format('Do MMM, YYYY')}</td>
+                <td className="has-text-centered">
+                  <a
+                    onClick={() => this.deleteRoleTopic(item.id)}
+                    className="button is-danger is-link"
+                  >
+                    <img
+                      className="svg svg-inline--fa fa-trash-alt fa-w-14"
+                      width="14"
+                      height="16"
+                      src={IconDelete}
+                      alt="Icon Delete"
+                    />
+                  </a>
+                </td>
+              </tr>
+            )) }
 
           </tbody>
         </table>
-        <br/>
-        Page:
-          { pages.map((p) => (
-              p === page ? (
-                  <button key={p} className="CurrentPage">{p}</button>
-                ) : (
-                  <button key={p} onClick={() => this.browsePage(p)}>{p}</button>
-                )
-            )) }
-        <br/>
-        <div className="Row">
-          <div className="Label">Role:</div> <input value={this.state.role}
-            onChange={ (e) => this.setState({ role: e.target.value }) } />
-          <div className="Label">Topic:</div> <select
-            onChange={ (e) => this.setState({ topic: e.target.value }) }>
-              <option value="">Select Topic</option>
-              { topics.map((tp, index) => (
-                  <option key={index}>{tp}</option>
-                )) }
-              }
-            </select>
-          <button className="AddRoleTopicBtn" onClick={this.addRoleTopic}>Add</button>
-        </div>
-        <div className="Row">
-          <button onClick={() => this.props.history.push('/')}>Back To Home</button>
+
+        <nav
+          className={`${styles.pagination} pagination`}
+          role="navigation"
+          aria-label="pagination"
+        >
+          <a
+            className="pagination-previous"
+            title="This is the first page"
+            onClick={() => (((page - 1) >= 1) && this.browsePage(page - 1))}
+            disabled={((page - 1) < 1)}
+          >Previous</a>
+          <a
+            className="pagination-next"
+            onClick={() => (((page + 1) <= pages.length) && this.browsePage(page + 1))}
+            disabled={((page + 1) > pages.length)}
+          >Next page</a>
+          <ul className="pagination-list">
+            { pages.map((p) => (
+                p === page ? (
+                    <li>
+                      <a key={p} className="pagination-link is-current" aria-label={`Page ${p}`} aria-current="page">{p}</a>
+                    </li>
+                  ) : (
+                    <li>
+                      <a onClick={() => this.browsePage(p)} className="pagination-link" aria-label={`Goto page ${p}`}>{p}</a>
+                    </li>
+                  )
+              )) }
+          </ul>
+        </nav>
+
+        <div className="buttons">
+          <a
+            className="button pull-right is-primary"
+            onClick={() => { this.props.history.push('/addroletopics') }}
+          >Add</a>
+          <a
+            className="button pull-right is-light"
+            onClick={() => { this.props.history.push('/') }}
+          >Cancel</a>
         </div>
       </div>
     );

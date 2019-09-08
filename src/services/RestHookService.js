@@ -22,7 +22,7 @@ const hookSchema = Joi.object()
     endpoint: Joi.string().required(),
     filter: Joi.string()
       .max(Number(config.RESTHOOK_FILTER_MAX_LENGTH))
-      .allow('')
+      .allow(''),
   })
   .required();
 
@@ -54,8 +54,8 @@ getAllHooks.schema = {
     limit: Joi.number()
       .integer()
       .min(1)
-      .default(10)
-  })
+      .default(10),
+  }),
 };
 
 /**
@@ -80,7 +80,9 @@ function* validateUserTopic(user, topic) {
  * @returns {Object} the created hook
  */
 function* createHook(data, user) {
+  // eslint-disable-next-line no-console
   console.log(data);
+  // eslint-disable-next-line no-console
   console.log(user);
   yield validateUserTopic(user, data.topic);
 
@@ -88,20 +90,21 @@ function* createHook(data, user) {
 
   const hook = yield RestHook.findOne({
     topic: data.topic,
-    endpoint: data.endpoint
+    endpoint: data.endpoint,
   });
   if (hook) {
     throw new ConflictError('The hook is already defined.');
   }
   data.handle = user.handle;
 
+  // eslint-disable-next-line no-console
   console.log(data);
   return yield RestHook.create(data);
 }
 
 createHook.schema = {
   data: hookSchema,
-  user: Joi.object().required()
+  user: Joi.object().required(),
 };
 
 /**
@@ -120,7 +123,7 @@ function* getHook(id, user) {
 
 getHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required()
+  user: Joi.object().required(),
 };
 
 /**
@@ -137,7 +140,7 @@ function* updateHook(id, data, user) {
 
   const hk = yield RestHook.findOne({
     topic: data.topic,
-    endpoint: data.endpoint
+    endpoint: data.endpoint,
   });
   if (hk && String(hk._id) !== id) {
     throw new ConflictError('The hook is already defined.');
@@ -155,7 +158,7 @@ function* updateHook(id, data, user) {
 updateHook.schema = {
   id: Joi.string().required(),
   data: hookSchema,
-  user: Joi.object().required()
+  user: Joi.object().required(),
 };
 
 /**
@@ -173,7 +176,7 @@ function* deleteHook(id, user) {
 
 deleteHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required()
+  user: Joi.object().required(),
 };
 
 /**
@@ -209,9 +212,9 @@ function* notifyHooks(message) {
   const hooks = yield RestHook.find({ topic: message.topic });
   // notify each hook in parallel
   yield _.map(hooks, hook =>
-    filterHook(hook, message)
+    (filterHook(hook, message)
       ? axios.post(hook.endpoint, message).catch(err => logger.error(err))
-      : null
+      : null)
   );
 }
 
@@ -232,5 +235,5 @@ module.exports = {
   getHook,
   updateHook,
   deleteHook,
-  notifyHooks
+  notifyHooks,
 };
