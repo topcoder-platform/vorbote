@@ -101,6 +101,12 @@ class AddHook extends Component {
           </div>
         </div>
 
+        <article class="message">
+          <div class="message-body">
+            <strong>NOTE:</strong> Vorbote needs to confirm that the endpoint that you specify in your Resthook is indeed owned by you. When you create this Resthook, it will immediately send a POST request to the endpoint specified. There will be no request body. Instead, there will be a custom header named <span class="tag is-white">x-hook-secret</span>. To this request, your endpoint needs to respond with a JSON object having an attribute <span class="tag is-white">x-hook-secret</span> for which the value is the value that was passed in the header mentioned earlier.
+          </div>
+        </article>
+
         <div className={`${styles.buttons} buttons`}>
           <a
             className="button pull-right is-primary"

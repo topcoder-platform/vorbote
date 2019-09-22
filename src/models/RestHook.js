@@ -11,6 +11,7 @@ const schema = new Schema({
   endpoint: { type: String, required: true },
   handle: { type: String, require: true },
   filter: String,
+  confirmed: Boolean,
 }, {
   timestamps: true,
 });

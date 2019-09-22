@@ -54,6 +54,15 @@ function* deleteHook(req, res) {
   res.status(200).end();
 }
 
+/**
+ * Confirm hook.
+ * @param req the request
+ * @param res the response
+ */
+function* confirmHook(req, res) {
+  res.json(yield RestHookService.confirmHook(req.params.id, req.user));
+}
+
 // Exports
 module.exports = {
   getAllHooks,
@@ -61,4 +70,5 @@ module.exports = {
   getHook,
   updateHook,
   deleteHook,
+  confirmHook,
 };

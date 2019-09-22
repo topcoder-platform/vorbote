@@ -23,6 +23,7 @@ The following parameters can be set in config files or in env variables:
 - KAFKA_CLIENT_CERT_KEY: Kafka connection private key, optional;
     if not provided, then SSL connection is not used, direct insecure connection is used;
     if provided, it can be either path to private key file or private key content
+- AXIOS_TIMEOUT: axios timeout in milliseconds
 
 ## Local Kafka setup
 
@@ -56,7 +57,7 @@ The following parameters can be set in config files or in env variables:
 ## Front end UI setup
 
 - the front end UI's build folder content are exposed as public content by the REST Hook app, so you may directly access it
-  via http://localhost:3000
+  via `http://localhost:3000`
 - note that if the front end UI's API_URL config is changed, it must be re-built using `npm run build` in the ui folder
 
 ## Local deployment
@@ -72,7 +73,8 @@ The following parameters can be set in config files or in env variables:
   it also starts Kafka consumer to listen for events and send to registered corresponding hooks,
   due to TC authentication, you need to browse `http://localhost:3000`
 - use another terminal to start sample client `npm run client`
-  the sample client is running at `http://localhost:5000`
+  the sample client is running at `http://localhost:5555`,
+  this client is needed for Postman and UI verification, but not needed for unit tests, because unit tests use nock to mock the callback APIs
 
 ## Verification
 
@@ -80,11 +82,11 @@ The following parameters can be set in config files or in env variables:
 - use the Postman collection and environment in docs folder to test the APIs
 - you don't need to start another front end app, the front end ui is built and exposed as public content by back end app
 - for UI testing, you need to browse `http://localhost:3000`, and you may login with credentials:
-  (admin) suser1 / Topcoder123
-  (copilot) mess / appirio123
+  (admin) tonyj / appirio123
+  (copilot) callmekatootie / appirio123
 - use the UI (login as admin) or Postman to add a hook,
   topic is `challenge.notification.create`,
-  endpoint is `http://localhost:5000/callback`,
+  endpoint is `http://localhost:5555/callback`,
   filter is a JavaScript code that can reference `message` object,
   e.g. `message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4`
 - use the kafka-console-producer to generate some messages in Kafka, see above for `Local Kafka setup` section
@@ -92,6 +94,10 @@ The following parameters can be set in config files or in env variables:
 - update the hook's filter code to `message.originator == 'not-found'`,
   use the kafka-console-producer to generate messages in Kafka again,
   then watch the sample client console, it should got NO new messages because the filter is evaluated to false
+- you may create and test hooks with endpoints `http://localhost:5555/callback-unconfirmed`, `http://localhost:5555/callback-late`
+  and `http://localhost:5555/callback-random` (it will get confirmed or not confirmed in random, so you may create multiple hooks
+  with this random callback, there are different behaviours)
+
 - login as admin, there is `Manage Role Topics` button for admin, click it to manage role topics
 - try create/delete some role topics, create more than 10 records to test the pagination functionalities
 - create a role topic record, role: copilot, topic: challenge.notification.create, so that copilot can use topic challenge.notification.create

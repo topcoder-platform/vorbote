@@ -8,6 +8,7 @@ const _ = require('lodash');
 const config = require('config');
 const Joi = require('joi');
 const axios = require('axios');
+const uuid = require('uuid/v4');
 const RestHook = require('../models').RestHook;
 const helper = require('../common/helper');
 const logger = require('../common/logger');
@@ -74,6 +75,30 @@ function* validateUserTopic(user, topic) {
 }
 
 /**
+ * Confirm endpoint.
+ * @param {String} endpoint the endpoint to confirm
+ * @returns {Boolean} whether it is confirmed
+ */
+function* confirmEndpoint(endpoint) {
+  const secret = uuid();
+  try {
+    const res = yield axios.post(endpoint, {}, {
+      headers: { 'x-hook-secret': secret },
+      timeout: Number(config.AXIOS_TIMEOUT),
+    });
+
+    if (_.isPlainObject(res.data)) {
+      return res.data && res.data['x-hook-secret'] === secret;
+    }
+
+    return false;
+  } catch (err) {
+    logger.error(err);
+    return false;
+  }
+}
+
+/**
  * Create hook.
  * @param {Object} data the request data
  * @param {Object} user the current user
@@ -96,6 +121,9 @@ function* createHook(data, user) {
     throw new ConflictError('The hook is already defined.');
   }
   data.handle = user.handle;
+
+  // confirm endpoint
+  data.confirmed = yield confirmEndpoint(data.endpoint);
 
   // eslint-disable-next-line no-console
   console.log(data);
@@ -151,6 +179,12 @@ function* updateHook(id, data, user) {
     throw new ForbiddenError("You can not access other user's hook.");
   }
   data.handle = user.handle;
+
+  // if endpoint is updated, then it needs to be re-confirmed
+  if (data.endpoint !== hook.endpoint) {
+    hook.confirmed = yield confirmEndpoint(data.endpoint);
+  }
+
   _.assignIn(hook, data);
   return yield hook.save();
 }
@@ -208,12 +242,12 @@ function filterHook(hook, message) {
  * @param {Object} message the message
  */
 function* notifyHooks(message) {
-  // find hooks of message topic
-  const hooks = yield RestHook.find({ topic: message.topic });
+  // find confirmed hooks of message topic
+  const hooks = yield RestHook.find({ topic: message.topic, confirmed: true });
   // notify each hook in parallel
   yield _.map(hooks, hook =>
     (filterHook(hook, message)
-      ? axios.post(hook.endpoint, message).catch(err => logger.error(err))
+      ? axios.post(hook.endpoint, message, { timeout: Number(config.AXIOS_TIMEOUT) }).catch(err => logger.error(err))
       : null)
   );
 }
@@ -228,6 +262,26 @@ function* notifyHooks(message) {
 //   }).required(),
 // };
 
+/**
+ * Confirm hook.
+ * @param {String} id the hook id
+ * @param {Object} user the current user
+ * @returns {Object} the updated hook
+ */
+function* confirmHook(id, user) {
+  const hook = yield helper.ensureExists(RestHook, id);
+  if (!user.isAdmin && hook.handle !== user.handle) {
+    throw new ForbiddenError("You can not access other user's hook.");
+  }
+  hook.confirmed = yield confirmEndpoint(hook.endpoint);
+  return yield hook.save();
+}
+
+confirmHook.schema = {
+  id: Joi.string().required(),
+  user: Joi.object().required(),
+};
+
 // Exports
 module.exports = {
   getAllHooks,
@@ -236,4 +290,5 @@ module.exports = {
   updateHook,
   deleteHook,
   notifyHooks,
+  confirmHook,
 };

@@ -32,6 +32,10 @@ class RoleTopics extends Component {
   }
 
   deleteRoleTopic(id) {
+    if (!window.confirm(`Are you sure to delete role topic of id ${id} ?`)) {
+      return;
+    }
+
     const _self = this;
     API.deleteRoleTopic(id, () => {
       _self.browsePage(_self.state.page);
@@ -93,7 +97,6 @@ class RoleTopics extends Component {
 
         <nav
           className={`${styles.pagination} pagination`}
-          role="navigation"
           aria-label="pagination"
         >
           <a
@@ -110,11 +113,11 @@ class RoleTopics extends Component {
           <ul className="pagination-list">
             { pages.map((p) => (
                 p === page ? (
-                    <li>
-                      <a key={p} className="pagination-link is-current" aria-label={`Page ${p}`} aria-current="page">{p}</a>
+                    <li key={`current-page${p}`}>
+                      <a className="pagination-link is-current" aria-label={`Page ${p}`} aria-current="page">{p}</a>
                     </li>
                   ) : (
-                    <li>
+                    <li key={`page${p}`}>
                       <a onClick={() => this.browsePage(p)} className="pagination-link" aria-label={`Goto page ${p}`}>{p}</a>
                     </li>
                   )
@@ -130,7 +133,7 @@ class RoleTopics extends Component {
           <a
             className="button pull-right is-light"
             onClick={() => { this.props.history.push('/') }}
-          >Cancel</a>
+          >Back to Resthooks</a>
         </div>
       </div>
     );

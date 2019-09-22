@@ -42,18 +42,25 @@ describe('Role Topic API Tests', () => {
   it('create role topic', (done) => {
     request.post('/api/v1/roletopics')
       .set('Authorization', `Bearer ${testConfig.TEST_ADMIN_TOKEN}`)
-      .send({ role: 'test-role', topic: 'topic' })
+      .send({ role: 'copilot', topic: 'topic1' })
       .expect(200)
       .end((err, res) => {
         if (err) {
           return done(err);
         }
         expect(res.body.id).to.exist; // eslint-disable-line
-        expect(res.body.role).to.equal('test-role');
-        expect(res.body.topic).to.equal('topic');
+        expect(res.body.role).to.equal('copilot');
+        expect(res.body.topic).to.equal('topic1');
         theId = res.body.id;
         return done();
       });
+  });
+
+  it('create role topic - already defined', (done) => {
+    request.post('/api/v1/roletopics')
+      .set('Authorization', `Bearer ${testConfig.TEST_ADMIN_TOKEN}`)
+      .send({ role: 'copilot', topic: 'topic1' })
+      .expect(409, done);
   });
 
   it('get all role topics 2', (done) => {
@@ -67,8 +74,35 @@ describe('Role Topic API Tests', () => {
         }
         expect(res.body.total).to.equal(1);
         expect(res.body.roleTopics[0].id).to.equal(theId);
-        expect(res.body.roleTopics[0].role).to.equal('test-role');
-        expect(res.body.roleTopics[0].topic).to.equal('topic');
+        expect(res.body.roleTopics[0].role).to.equal('copilot');
+        expect(res.body.roleTopics[0].topic).to.equal('topic1');
+        return done();
+      });
+  });
+
+  it('get topics by admin', (done) => {
+    request.get('/api/v1/topics')
+      .set('Authorization', `Bearer ${testConfig.TEST_ADMIN_TOKEN}`)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        expect(res.body.length).to.equal(0);
+        return done();
+      });
+  });
+
+  it('get topics by non-admin', (done) => {
+    request.get('/api/v1/topics')
+      .set('Authorization', `Bearer ${testConfig.TEST_NON_ADMIN_TOKEN}`)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        expect(res.body.length).to.equal(1);
+        expect(res.body[0]).to.equal('topic1');
         return done();
       });
   });
@@ -112,7 +146,14 @@ describe('Role Topic API Tests', () => {
   it('create role topic - not admin', (done) => {
     request.post('/api/v1/roletopics')
       .set('Authorization', `Bearer ${testConfig.TEST_NON_ADMIN_TOKEN}`)
-      .send({ role: 'test-role2', topic: 'topic2' })
+      .send({ role: 'test-role', topic: 'topic2' })
+      .expect(403, done);
+  });
+
+  it('get all role topics by non-admin', (done) => {
+    request.get('/api/v1/roletopics')
+      .query({ offset: 0, limit: 10 })
+      .set('Authorization', `Bearer ${testConfig.TEST_NON_ADMIN_TOKEN}`)
       .expect(403, done);
   });
 });

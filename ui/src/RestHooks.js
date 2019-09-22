@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import moment from 'moment';
 import styles from './RestHooks.css';
 import API from './services/API';
@@ -17,13 +18,19 @@ class RestHooks extends Component {
       page: 1,
       total: 0,
       selectedFilter: '',
+      loading: {}
     };
     this.deleteHook = this.deleteHook.bind(this);
     this.browsePage = this.browsePage.bind(this);
+    this.confirmHook = this.confirmHook.bind(this);
   }
 
   componentDidMount() {
     this.browsePage(1);
+  }
+
+  componentWillUnmount() {
+    this.destroyed = true;
   }
 
   browsePage(p) {
@@ -34,14 +41,42 @@ class RestHooks extends Component {
   }
 
   deleteHook(id) {
+    if (!window.confirm(`Are you sure to delete hook of id ${id} ?`)) {
+      return;
+    }
+
     const _self = this;
     API.deleteHook(id, () => {
       _self.browsePage(_self.state.page);
     });
   }
 
+  confirmHook(id) {
+    const _self = this;
+    const ld = _.clone(_self.state.loading);
+    ld[id] = true;
+    _self.setState({ loading: ld });
+
+    API.confirmHook(id, (result) => {
+      if (_self.destroyed) {
+        return;
+      }
+
+      const ld2 = _.clone(_self.state.loading);
+      ld2[id] = false;
+
+      const hks = _.clone(_self.state.hooks);
+      const hk = _.find(hks, (hook) => hook.id === id);
+      if (hk) {
+        hk.confirmed = result.confirmed;
+      }
+
+      _self.setState({ loading: ld2, hooks: hks });
+    });
+  }
+
   render() {
-    const { hooks, page, total, selectedFilter } = this.state;
+    const { hooks, page, total, selectedFilter, loading } = this.state;
     let pageCount = Math.ceil(total / pageSize);
     if (pageCount < 1) pageCount = 1;
     const pages = [];
@@ -62,6 +97,7 @@ class RestHooks extends Component {
               <th className="has-text-centered">RULE</th>
               <th className="has-text-centered">CREATED AT</th>
               <th className="has-text-centered">UPDATED AT</th>
+              <th className="has-text-centered">CONFIRMED</th>
               <th className="has-text-centered">ACTION</th>
             </tr>
           </thead>
@@ -85,6 +121,23 @@ class RestHooks extends Component {
                 </td>
                 <td className="has-text-centered">{moment(hook.createdAt).format('Do MMM, YYYY')}</td>
                 <td className="has-text-centered">{moment(hook.updatedAt).format('Do MMM, YYYY')}</td>
+                <td className="control has-text-centered">
+                  {hook.confirmed && !loading[hook.id] && (
+                    <span className="tag is-primary">Yes</span>
+                  )}
+                  {!hook.confirmed && !loading[hook.id] && (
+                    <div>
+                      <span className="tag is-danger">No</span>
+                      <a
+                        className="button is-primary is-link reload-button"
+                        onClick={() => this.confirmHook(hook.id)}
+                      >Reload</a>
+                    </div>
+                  )}
+                  { loading[hook.id] && (
+                    <span>Loading...</span>
+                  )}
+                </td>
                 <td className={styles['table-actions-column']}>
                   <div className="buttons">
                     <a
@@ -120,7 +173,6 @@ class RestHooks extends Component {
         </table>
         <nav
           className={`${styles.pagination} pagination`}
-          role="navigation"
           aria-label="pagination"
         >
           <a
@@ -137,11 +189,11 @@ class RestHooks extends Component {
           <ul className="pagination-list">
             { pages.map((p) => (
                 p === page ? (
-                    <li>
-                      <a key={p} className="pagination-link is-current" aria-label={`Page ${p}`} aria-current="page">{p}</a>
+                    <li key={`current-page${p}`}>
+                      <a className="pagination-link is-current" aria-label={`Page ${p}`} aria-current="page">{p}</a>
                     </li>
                   ) : (
-                    <li>
+                    <li key={`page${p}`}>
                       <a onClick={() => this.browsePage(p)} className="pagination-link" aria-label={`Goto page ${p}`}>{p}</a>
                     </li>
                   )

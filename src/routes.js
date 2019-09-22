@@ -25,6 +25,12 @@ module.exports = {
       method: 'deleteHook',
     },
   },
+  '/hooks/:id/confirm': {
+    post: {
+      controller: 'RestHookController',
+      method: 'confirmHook',
+    },
+  },
   '/topics': {
     get: {
       controller: 'RoleTopicController',

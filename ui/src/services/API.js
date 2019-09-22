@@ -25,6 +25,20 @@ const API = {
     });
   },
 
+  confirmHook: (id, cb) => {
+    superagent
+      .post(`${config.API_URL}/hooks/${id}/confirm`)
+      .set('Authorization', `Bearer ${getToken()}`)
+      .timeout(Number(config.CONFIRM_HOOK_TIMEOUT))
+      .end((err, res) => {
+      if (err) {
+        cb({ confirmed: false });
+      } else {
+        cb({ confirmed: res.body.confirmed });
+      }
+    });
+  },
+
   createHook: (data, cb) => {
     superagent.post(`${config.API_URL}/hooks`).set('Authorization', `Bearer ${getToken()}`).send(data).end((err, res) => {
       if (err) {

@@ -14,4 +14,6 @@ module.exports = {
   // for the local Kafka, they are not needed
   KAFKA_CLIENT_CERT: process.env.KAFKA_CLIENT_CERT,
   KAFKA_CLIENT_CERT_KEY: process.env.KAFKA_CLIENT_CERT_KEY,
+  // axios timeout in milliseconds
+  AXIOS_TIMEOUT: process.env.AXIOS_TIMEOUT || 10000,
 };
