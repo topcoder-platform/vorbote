@@ -87,7 +87,7 @@ class App extends Component {
                       Welcome, {this.state.currentUser.handle}
                     </a>
                     <div className="navbar-dropdown is-boxed">
-                      <a onClick={this.logout} href="" className="navbar-item">Logout</a>
+                      <a onClick={this.logout} href="javascript:;" className="navbar-item">Logout</a>
                     </div>
                   </div>
                 </div>
