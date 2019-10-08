@@ -12,7 +12,7 @@ const RestHookService = require('../services/RestHookService');
  */
 function* getAllHooks(req, res) {
   if (!req.user.isAdmin) {
-    req.query.handle = req.user.handle;
+    req.query.owner = req.user.handle;
   }
   res.json(yield RestHookService.getAllHooks(req.query));
 }
@@ -63,6 +63,15 @@ function* confirmHook(req, res) {
   res.json(yield RestHookService.confirmHook(req.params.id, req.user));
 }
 
+/**
+ * Get hook histories.
+ * @param req the request
+ * @param res the response
+ */
+function* getHookHistories(req, res) {
+  res.json(yield RestHookService.getHookHistories(req.params.id, req.user));
+}
+
 // Exports
 module.exports = {
   getAllHooks,
@@ -71,4 +80,5 @@ module.exports = {
   updateHook,
   deleteHook,
   confirmHook,
+  getHookHistories,
 };

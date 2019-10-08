@@ -21,6 +21,8 @@ The following parameters can be set in config file:
 - TC_ADMIN_ROLE: the TC admin role name
 - PAGE_SIZE: the page size
 - CONFIRM_HOOK_TIMEOUT: confirm hook timeout in milliseconds
+- RESTHOOK_HEADERS_COUNT: REST hook headers max count
+- REQUIRE_HTTPS_HOOK: whether hook requires HTTPS, if true then only HTTPS hook is allowed, otherwise any endpoint is allowed
 
 Run the application at `http://localhost:3000`
 

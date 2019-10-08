@@ -5,7 +5,3 @@
 :local(.table-actions-column) {
   min-width: 113px;
 }
-
-.reload-button {
-  margin-left: 8px;
-}

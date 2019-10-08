@@ -7,6 +7,8 @@ import config from './config/config';
 import IconEdit from './assets/images/icon-edit.svg';
 import IconDelete from './assets/images/icon-delete.svg';
 import IconView from './assets/images/icon-view.svg';
+import IconDots from './assets/images/icon-dots.svg';
+import Popup from 'reactjs-popup';
 
 const pageSize = Number(config.PAGE_SIZE);
 
@@ -92,6 +94,11 @@ class RestHooks extends Component {
           <thead className="thead">
             <tr>
               <th className="has-text-centered">ID</th>
+              <th className="has-text-centered">NAME</th>
+              <th className="has-text-centered">DESCRIPTION</th>
+              {this.props.currentUser.isAdmin && (
+                <th className="has-text-centered">OWNER</th>
+              )}
               <th className="has-text-centered">TOPIC</th>
               <th className="has-text-centered">ENDPOINT</th>
               <th className="has-text-centered">RULE</th>
@@ -105,6 +112,11 @@ class RestHooks extends Component {
             { hooks.map((hook, index) => (
               <tr key={hook.id}>
                 <td className="has-text-centered">{this.props.currentUser.isAdmin ? hook.id : (pageSize * (page - 1) + index + 1)}</td>
+                <td className="has-text-centered">{hook.name}</td>
+                <td className="has-text-centered">{hook.description}</td>
+                {this.props.currentUser.isAdmin && (
+                  <td className="has-text-centered">{hook.owner}</td>
+                )}
                 <td><span className="tag is-dark">{hook.topic}</span></td>
                 <td className="word-break">{hook.endpoint}</td>
                 <td>
@@ -123,48 +135,62 @@ class RestHooks extends Component {
                 <td className="has-text-centered">{moment(hook.updatedAt).format('Do MMM, YYYY')}</td>
                 <td className="control has-text-centered">
                   {hook.confirmed && !loading[hook.id] && (
-                    <span className="tag is-primary">Yes</span>
+                    <span className="has-text-primary">Yes</span>
                   )}
                   {!hook.confirmed && !loading[hook.id] && (
                     <div>
-                      <span className="tag is-danger">No</span>
+                      <span className="has-text-danger">No</span>&nbsp;
                       <a
-                        className="button is-primary is-link reload-button"
+                        className="button is-small is-text reload-button"
                         onClick={() => this.confirmHook(hook.id)}
-                      >Reload</a>
+                      >Try again</a>
                     </div>
                   )}
                   { loading[hook.id] && (
                     <span>Loading...</span>
                   )}
                 </td>
-                <td className={styles['table-actions-column']}>
-                  <div className="buttons">
-                    <a
-                      onClick={() => { this.props.history.push('/updatehook/' + hook.id) }}
-                      className="button is-link"
-                    >
+                <td className="has-text-centered">
+                  <Popup trigger={<a className="button">
                       <img
                         width="18"
                         height="16"
-                        src={IconEdit}
-                        className="svg svg-inline--fa fa-edit fa-w-18"
-                        alt="Icon Edit"
+                        src={IconDots}
+                        className="svg svg-inline--fa"
+                        alt="Icon Dots"
                       />
-                    </a>
-                    <a
-                      onClick={() => this.deleteHook(hook.id)}
-                      className="button is-danger is-link"
-                    >
-                      <img
-                        className="svg svg-inline--fa fa-trash-alt fa-w-14"
-                        width="14"
-                        height="16"
-                        src={IconDelete}
-                        alt="Icon Delete"
-                      />
-                    </a>
-                  </div>
+                    </a>}>
+                    <div className="buttons">
+                      <a
+                        onClick={() => { this.props.history.push('/updatehook/' + hook.id) }}
+                        className="button is-link"
+                      >
+                        <img
+                          width="18"
+                          height="16"
+                          src={IconEdit}
+                          className="svg svg-inline--fa fa-edit fa-w-18"
+                          alt="Icon Edit"
+                        />
+                      </a>
+                      <a
+                        onClick={() => this.deleteHook(hook.id)}
+                        className="button is-danger is-link"
+                      >
+                        <img
+                          className="svg svg-inline--fa fa-trash-alt fa-w-14"
+                          width="14"
+                          height="16"
+                          src={IconDelete}
+                          alt="Icon Delete"
+                        />
+                      </a>
+                      <a
+                        className="button is-primary is-link reload-button"
+                        onClick={() => { this.props.history.push('/hookhistories/' + hook.id) }}
+                      >History</a>
+                    </div>
+                  </Popup>
                 </td>
               </tr>
             )) }

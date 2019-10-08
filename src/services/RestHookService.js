@@ -10,6 +10,7 @@ const Joi = require('joi');
 const axios = require('axios');
 const uuid = require('uuid/v4');
 const RestHook = require('../models').RestHook;
+const RestHookHistory = require('../models').RestHookHistory;
 const helper = require('../common/helper');
 const logger = require('../common/logger');
 const ConflictError = require('../common/errors').ConflictError;
@@ -19,11 +20,14 @@ const RoleTopicService = require('./RoleTopicService');
 
 const hookSchema = Joi.object()
   .keys({
+    name: Joi.string().max(50).required(),
+    description: Joi.string().max(400).allow(''),
     topic: Joi.string().required(),
     endpoint: Joi.string().required(),
     filter: Joi.string()
       .max(Number(config.RESTHOOK_FILTER_MAX_LENGTH))
       .allow(''),
+    headers: Joi.object().pattern(/.*/, Joi.string().required()),
   })
   .required();
 
@@ -34,8 +38,8 @@ const hookSchema = Joi.object()
  */
 function* getAllHooks(query) {
   const filter = {};
-  if (query.handle) {
-    filter.handle = query.handle;
+  if (query.owner) {
+    filter.owner = query.owner;
   }
   const total = yield RestHook.count(filter);
   const hooks = yield RestHook.find(filter)
@@ -47,7 +51,7 @@ function* getAllHooks(query) {
 
 getAllHooks.schema = {
   query: Joi.object().keys({
-    handle: Joi.string(),
+    owner: Joi.string(),
     offset: Joi.number()
       .integer()
       .min(0)
@@ -120,7 +124,7 @@ function* createHook(data, user) {
   if (hook) {
     throw new ConflictError('The hook is already defined.');
   }
-  data.handle = user.handle;
+  data.owner = user.handle;
 
   // confirm endpoint
   data.confirmed = yield confirmEndpoint(data.endpoint);
@@ -143,7 +147,7 @@ createHook.schema = {
  */
 function* getHook(id, user) {
   const hook = yield helper.ensureExists(RestHook, id);
-  if (!user.isAdmin && hook.handle !== user.handle) {
+  if (!user.isAdmin && hook.owner !== user.handle) {
     throw new ForbiddenError("You can not access other user's hook.");
   }
   return hook;
@@ -174,11 +178,7 @@ function* updateHook(id, data, user) {
     throw new ConflictError('The hook is already defined.');
   }
 
-  const hook = yield helper.ensureExists(RestHook, id);
-  if (!user.isAdmin && hook.handle !== user.handle) {
-    throw new ForbiddenError("You can not access other user's hook.");
-  }
-  data.handle = user.handle;
+  const hook = yield getHook(id, user);
 
   // if endpoint is updated, then it needs to be re-confirmed
   if (data.endpoint !== hook.endpoint) {
@@ -186,6 +186,15 @@ function* updateHook(id, data, user) {
   }
 
   _.assignIn(hook, data);
+  if (!data.description) {
+    hook.description = null;
+  }
+  if (!data.filter) {
+    hook.filter = null;
+  }
+  if (!data.headers) {
+    hook.headers = null;
+  }
   return yield hook.save();
 }
 
@@ -201,10 +210,7 @@ updateHook.schema = {
  * @param {Object} user the current user
  */
 function* deleteHook(id, user) {
-  const hook = yield helper.ensureExists(RestHook, id);
-  if (!user.isAdmin && hook.handle !== user.handle) {
-    throw new ForbiddenError("You can not access other user's hook.");
-  }
+  const hook = yield getHook(id, user);
   yield hook.remove();
 }
 
@@ -238,6 +244,47 @@ function filterHook(hook, message) {
 }
 
 /**
+ * Notify given hook of given message.
+ * @param {Object} hook the hook
+ * @param {Object} message the message
+ */
+function* notifyHook(hook, message) {
+  const history = {
+    hookId: hook._id,
+    requestData: message,
+  };
+  // call hook endpoint
+  try {
+    const res = yield axios.post(hook.endpoint, message, {
+      headers: hook.headers || {},
+      timeout: Number(config.AXIOS_TIMEOUT),
+      validateStatus: () => true,
+    });
+    history.responseStatus = res.status;
+    if (res.status < 200 || res.status >= 300) {
+      logger.error(`Failed to call hook endpoint: ${res.statusText}, ${JSON.stringify(res.data, null, 4)}`);
+    }
+  } catch (err) {
+    logger.error('Failed to call hook endpoint.');
+    logger.error(err);
+    history.responseStatus = 500;
+  }
+
+  try {
+    // remove old histories
+    const histories = yield RestHookHistory.find({ hookId: hook._id }).sort('-createdAt');
+    for (let i = Number(config.HOOK_HISTORY_COUNT) - 1; i < histories.length; i += 1) {
+      yield histories[i].remove();
+    }
+
+    // save history
+    yield RestHookHistory.create(history);
+  } catch (e) {
+    logger.error(e);
+  }
+}
+
+/**
  * Notify hooks of given message.
  * @param {Object} message the message
  */
@@ -245,11 +292,7 @@ function* notifyHooks(message) {
   // find confirmed hooks of message topic
   const hooks = yield RestHook.find({ topic: message.topic, confirmed: true });
   // notify each hook in parallel
-  yield _.map(hooks, hook =>
-    (filterHook(hook, message)
-      ? axios.post(hook.endpoint, message, { timeout: Number(config.AXIOS_TIMEOUT) }).catch(err => logger.error(err))
-      : null)
-  );
+  yield _.map(hooks, hook => (filterHook(hook, message) ? notifyHook(hook, message) : null));
 }
 
 // notifyHooks.schema = {
@@ -269,15 +312,32 @@ function* notifyHooks(message) {
  * @returns {Object} the updated hook
  */
 function* confirmHook(id, user) {
-  const hook = yield helper.ensureExists(RestHook, id);
-  if (!user.isAdmin && hook.handle !== user.handle) {
-    throw new ForbiddenError("You can not access other user's hook.");
-  }
+  const hook = yield getHook(id, user);
   hook.confirmed = yield confirmEndpoint(hook.endpoint);
   return yield hook.save();
 }
 
 confirmHook.schema = {
+  id: Joi.string().required(),
+  user: Joi.object().required(),
+};
+
+/**
+ * Get hook histories.
+ * @param {String} id the hook id
+ * @param {Object} user the current user
+ * @returns {Array} the hook histories
+ */
+function* getHookHistories(id, user) {
+  // ensure the hook exists and user can access it
+  yield getHook(id, user);
+  // find histories of given hook id
+  // sort by createdAt in descending order, so that latest histories will be shown first
+  const histories = yield RestHookHistory.find({ hookId: id }).sort('-createdAt');
+  return histories;
+}
+
+getHookHistories.schema = {
   id: Joi.string().required(),
   user: Joi.object().required(),
 };
@@ -291,4 +351,5 @@ module.exports = {
   deleteHook,
   notifyHooks,
   confirmHook,
+  getHookHistories,
 };

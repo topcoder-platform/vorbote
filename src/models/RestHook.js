@@ -7,11 +7,14 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
+  name: { type: String, required: true },
+  description: String,
   topic: { type: String, required: true },
   endpoint: { type: String, required: true },
-  handle: { type: String, require: true },
+  owner: { type: String, required: true },
   filter: String,
   confirmed: Boolean,
+  headers: Object,
 }, {
   timestamps: true,
 });

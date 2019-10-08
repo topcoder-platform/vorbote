@@ -16,4 +16,5 @@ module.exports = {
   KAFKA_CLIENT_CERT_KEY: process.env.KAFKA_CLIENT_CERT_KEY,
   // axios timeout in milliseconds
   AXIOS_TIMEOUT: process.env.AXIOS_TIMEOUT || 10000,
+  HOOK_HISTORY_COUNT: process.env.HOOK_HISTORY_COUNT || 10,
 };

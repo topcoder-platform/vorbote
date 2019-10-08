@@ -4,6 +4,7 @@ import './App.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import config from './config/config';
 import RestHooks from './RestHooks';
+import RestHookHistories from './RestHookHistories';
 import AddHook from './AddHook';
 import UpdateHook from './UpdateHook';
 import RoleTopics from './RoleTopics';
@@ -87,7 +88,7 @@ class App extends Component {
                       Welcome, {this.state.currentUser.handle}
                     </a>
                     <div className="navbar-dropdown is-boxed">
-                      <a onClick={this.logout} href="javascript:;" className="navbar-item">Logout</a>
+                      <a onClick={this.logout} className="navbar-item">Logout</a>
                     </div>
                   </div>
                 </div>
@@ -99,6 +100,7 @@ class App extends Component {
             <Route exact path="/" render={(props) => <RestHooks {...props} currentUser={this.state.currentUser} />} />
             <Route exact path="/addhook" render={(props) => <AddHook {...props} currentUser={this.state.currentUser} />} />
             <Route exact path="/updatehook/:id" render={(props) => <UpdateHook {...props} currentUser={this.state.currentUser} />} />
+            <Route exact path="/hookhistories/:id" render={(props) => <RestHookHistories {...props} currentUser={this.state.currentUser} />} />
             <Route exact path="/roletopics" render={(props) => <RoleTopics {...props} currentUser={this.state.currentUser} />} />
             <Route exact path="/addroletopics" render={(props) => <AddRoleTopics {...props} currentUser={this.state.currentUser} />} />
           </section>

@@ -69,6 +69,16 @@ const API = {
     });
   },
 
+  getHookHistories: (id, cb) => {
+    superagent.get(`${config.API_URL}/hooks/${id}/histories`).set('Authorization', `Bearer ${getToken()}`).end((err, res) => {
+      if (err) {
+        alert(`Failed to get REST hook histories. ${ err }`);
+      } else {
+        cb(res.body);
+      }
+    });
+  },
+
   getTopics: (cb) => {
     superagent.get(`${config.API_URL}/topics`).set('Authorization', `Bearer ${getToken()}`).end((err, res) => {
       if (err) {

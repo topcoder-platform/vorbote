@@ -25,6 +25,12 @@ module.exports = {
       method: 'deleteHook',
     },
   },
+  '/hooks/:id/histories': {
+    get: {
+      controller: 'RestHookController',
+      method: 'getHookHistories',
+    },
+  },
   '/hooks/:id/confirm': {
     post: {
       controller: 'RestHookController',

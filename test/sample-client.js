@@ -21,6 +21,8 @@ app.post('/callback', (req, res) => {
     res.send({ 'x-hook-secret': req.headers['x-hook-secret'] });
     return;
   }
+  logger.info('Sample client got headers:');
+  logger.info(JSON.stringify(req.headers, null, 4));
   logger.info('Sample client got callback data:');
   logger.info(JSON.stringify(req.body, null, 4));
   res.end();
@@ -33,6 +35,8 @@ app.post('/callback-random', (req, res) => {
     setTimeout(() => res.send({ 'x-hook-secret': secret }), 3000);
     return;
   }
+  logger.info('Sample client got headers:');
+  logger.info(JSON.stringify(req.headers, null, 4));
   logger.info('Sample client got callback data:');
   logger.info(JSON.stringify(req.body, null, 4));
   res.end();

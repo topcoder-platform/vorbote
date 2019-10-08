@@ -24,6 +24,7 @@ The following parameters can be set in config files or in env variables:
     if not provided, then SSL connection is not used, direct insecure connection is used;
     if provided, it can be either path to private key file or private key content
 - AXIOS_TIMEOUT: axios timeout in milliseconds
+- HOOK_HISTORY_COUNT: hook history max count
 
 ## Local Kafka setup
 
@@ -67,30 +68,33 @@ The following parameters can be set in config files or in env variables:
 - start local Mongo db, update the config/default.js MONGODB_URI param to point to a new db
 - install dependencies `npm i`
 - run code lint check `npm run lint`
-- run test `npm run test`
+- run test `npm run test`, note that this will clear all data
 - start REST Hook app `npm start`,
   the app is running at `http://localhost:3000`,
   it also starts Kafka consumer to listen for events and send to registered corresponding hooks,
   due to TC authentication, you need to browse `http://localhost:3000`
 - use another terminal to start sample client `npm run client`
   the sample client is running at `http://localhost:5555`,
-  this client is needed for Postman and UI verification, but not needed for unit tests, because unit tests use nock to mock the callback APIs
+  this client is needed for UI verification, but not needed for unit tests, because unit tests use nock to mock the callback APIs
 
 ## Verification
 
 - setup stuff following above deployment
-- use the Postman collection and environment in docs folder to test the APIs
 - you don't need to start another front end app, the front end ui is built and exposed as public content by back end app
 - for UI testing, you need to browse `http://localhost:3000`, and you may login with credentials:
   (admin) tonyj / appirio123
   (copilot) callmekatootie / appirio123
-- use the UI (login as admin) or Postman to add a hook,
+- use the UI (login as admin) to add a hook,
+  name can be any non-empty string,
+  description is optional,
   topic is `challenge.notification.create`,
   endpoint is `http://localhost:5555/callback`,
   filter is a JavaScript code that can reference `message` object,
   e.g. `message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4`
 - use the kafka-console-producer to generate some messages in Kafka, see above for `Local Kafka setup` section
   for sample messages, then watch the sample client console, it should got some messages
+- you may send more than 10 messages to the hook, view its history, only the last 10 history records are kept
+- after a hook is confirmed, you may stop the sample client, then send message, then a failed hook call history can be generated
 - update the hook's filter code to `message.originator == 'not-found'`,
   use the kafka-console-producer to generate messages in Kafka again,
   then watch the sample client console, it should got NO new messages because the filter is evaluated to false
@@ -106,3 +110,10 @@ The following parameters can be set in config files or in env variables:
   see admin's rest hooks
 - create/update some rest hooks, you can see copilot can only use topic `challenge.notification.create` which is setup by admin
 - for the functionalities to detect new topic, I don't see no-kafka has API to directly detect new topic, so it uses another approach, it will refresh the Kafka consumer periodically, when consumer is refreshed, all new topics are detected. To test this functionality, update back end REFRESH_KAFKA_CONSUMER_PERIOD_MINUTE config param to 1, so that consumer will be refreshed every minute. Then start the app, login as admin, see the topics; create a new topic in Kafka, wait for more than 1 minute, use the UI to view the topics again, new topic can be seen.
+
+- the sample client supports only HTTP, but not HTTPS, so above verification allows HTTP endpoint hooks, to test HTTPS endpoint validation, do below:
+  in the root folder, update `set-env.js` config `REQUIRE_HTTPS_HOOK` default value to `'true'`,
+  run `npm i`, this will update UI config and re-build UI distribution,
+  run `npm start`, then verify HTTPS validation in add/update hook pages.
+  You may use any HTTPS endpoint, it won't be confirmed, and thus won't get called, but you can still add/update the hook.
+
