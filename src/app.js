@@ -16,7 +16,7 @@ const errors = require('./common/errors');
 const Kafka = require('no-kafka');
 const co = require('co');
 const RestHookService = require('./services/RestHookService');
-const decodeToken = require('@topcoder-platform/tc-auth-lib').decodeToken();
+const decodeToken = require('@topcoder-platform/tc-auth-lib').decodeToken;
 
 let currentConsumer = null;
 let currentTopics = [];

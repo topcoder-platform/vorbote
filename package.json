@@ -4,7 +4,7 @@
   "description": "Topcoder Event RestHooks",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node -r esm src/app.js",
     "lint": "eslint src config test",
     "test": "nyc mocha test/*.test.js --timeout 20000 --require test/prepare.js --exit",
     "client": "node test/sample-client.js",
@@ -32,6 +32,7 @@
     "co": "^4.6.0",
     "config": "^1.21.0",
     "cors": "^2.7.1",
+    "esm": "^3.2.25",
     "express": "^4.14.0",
     "get-parameter-names": "^0.3.0",
     "joi": "^9.0.4",
