@@ -18,6 +18,8 @@ const co = require('co');
 const RestHookService = require('./services/RestHookService');
 const decodeToken = require('@topcoder-platform/tc-auth-lib').decodeToken;
 
+global.atob  = require('atob');
+
 let currentConsumer = null;
 let currentTopics = [];
 
