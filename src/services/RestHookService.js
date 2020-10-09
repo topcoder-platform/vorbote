@@ -86,7 +86,7 @@ function* validateUserTopic(user, topic) {
 function* confirmEndpoint(endpoint) {
   const secret = uuid();
   try {
-    const res = yield axios.post(endpoint, {}, {
+    const res = yield axios.post(endpoint, '', {
       headers: { 'x-hook-secret': secret },
       timeout: Number(config.AXIOS_TIMEOUT),
     });
