@@ -16,7 +16,9 @@ const errors = require('./common/errors');
 const Kafka = require('no-kafka');
 const co = require('co');
 const RestHookService = require('./services/RestHookService');
-const tcAuth = require('./tc-auth');
+const decodeToken = require('@topcoder-platform/tc-auth-lib').decodeToken;
+
+global.atob  = require('atob');
 
 let currentConsumer = null;
 let currentTopics = [];
@@ -95,7 +97,7 @@ const authMiddleware = (req, res, next) => {
     return next(new errors.UnauthorizedError('Authentication required.'));
   }
   try {
-    req.user = tcAuth.decodeToken(token);
+    req.user = decodeToken(token);
   } catch (err) {
     logger.error('Failed to decode JWT token.');
     logger.error(err);
