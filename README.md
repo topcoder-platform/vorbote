@@ -115,5 +115,5 @@ The following parameters can be set in config files or in env variables:
   in the root folder, update `set-env.js` config `REQUIRE_HTTPS_HOOK` default value to `'true'`,
   run `npm i`, this will update UI config and re-build UI distribution,
   run `npm start`, then verify HTTPS validation in add/update hook pages.
-  You may use any HTTPS endpoint, it won't be confirmed, and thus won't get called, but you can still add/update the hook.
+  You may use any HTTPS endpoint, it won't be confirmed, and thus won't get called, but you can still add/update the hook. 
 
