@@ -9,7 +9,7 @@ import AddHook from './AddHook';
 import UpdateHook from './UpdateHook';
 import RoleTopics from './RoleTopics';
 import AddRoleTopics from './AddRoleTopics';
-import { getFreshToken, configureConnector, decodeToken } from '@topcoder-platform/tc-auth-lib';
+import { getFreshToken, configureConnector, decodeToken } from 'tc-auth-lib';
 
 class App extends Component {
   constructor() {
