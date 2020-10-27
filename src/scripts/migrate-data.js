@@ -15,6 +15,7 @@ logger.info('Migrate data from MongoDB to DynamoDB.');
 // convert MongoDB entity to data suitable for DynamoDB
 function convertEntity(entity) {
   const obj = entity.toJSON();
+  logger.info('Object: ', obj)
   if (obj.createdAt) {
     obj.createdAt = obj.createdAt.toISOString();
   }
@@ -35,16 +36,19 @@ function convertEntity(entity) {
 
 function* migrateData() {
   // migrate role types
+  logger.info('Migrating Role topics...')
   const rts = yield RoleTopic.find({});
   for (const rt of rts) {
     yield helper.create('RoleTopic', convertEntity(rt));
   }
   // migrate rest hooks
+  logger.info('Migrating Rest hooks...')
   const hooks = yield RestHook.find({});
   for (const hook of hooks) {
     yield helper.create('RestHook', convertEntity(hook));
   }
   // migrate rest hook histories
+  logger.info('Migrating Rest hook history...')
   const histories = yield RestHookHistory.find({});
   for (const h of histories) {
     yield helper.create('RestHookHistory', convertEntity(h));
