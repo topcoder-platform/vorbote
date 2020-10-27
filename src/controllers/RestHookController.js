@@ -80,5 +80,5 @@ module.exports = {
   updateHook,
   deleteHook,
   confirmHook,
-  getHookHistories,
+  getHookHistories
 };

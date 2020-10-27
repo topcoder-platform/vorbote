@@ -8,7 +8,10 @@
     "lint": "eslint src config test",
     "test": "nyc mocha test/*.test.js --timeout 20000 --require test/prepare.js --exit",
     "client": "node test/sample-client.js",
-    "postinstall": "node set-env.js && cd ui && npm install && npm run build && cd .."
+    "postinstall": "node set-env.js && cd ui && npm install && npm run build && cd ..",
+    "create-tables": "node src/scripts/create-tables.js",
+    "init-db": "node src/scripts/init-db.js",
+    "migrate-data": "node src/scripts/migrate-data.js"
   },
   "author": "TCSCODER",
   "license": "none",
@@ -24,7 +27,6 @@
     "supertest": "^4.0.2"
   },
   "dependencies": {
-    "tc-auth-lib": "github:topcoder-platform/tc-auth-lib#1.0.1",
     "atob": "^2.1.1",
     "axios": "^0.19.0",
     "bluebird": "^3.5.1",
@@ -32,6 +34,7 @@
     "co": "^4.6.0",
     "config": "^1.21.0",
     "cors": "^2.7.1",
+    "dynamoose": "^2.3.0",
     "esm": "^3.2.25",
     "express": "^4.14.0",
     "get-parameter-names": "^0.3.0",
@@ -40,6 +43,7 @@
     "mongoose": "^5.7.0",
     "no-kafka": "^3.4.3",
     "sandbox.js": "^2.0.2",
+    "tc-auth-lib": "github:topcoder-platform/tc-auth-lib#1.0.1",
     "uuid": "^3.3.3",
     "winston": "^2.2.0"
   },

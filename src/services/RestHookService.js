@@ -9,8 +9,6 @@ const config = require('config');
 const Joi = require('joi');
 const axios = require('axios');
 const uuid = require('uuid/v4');
-const RestHook = require('../models').RestHook;
-const RestHookHistory = require('../models').RestHookHistory;
 const helper = require('../common/helper');
 const logger = require('../common/logger');
 const ConflictError = require('../common/errors').ConflictError;
@@ -27,9 +25,25 @@ const hookSchema = Joi.object()
     filter: Joi.string()
       .max(Number(config.RESTHOOK_FILTER_MAX_LENGTH))
       .allow(''),
-    headers: Joi.object().pattern(/.*/, Joi.string().required()),
+    headers: Joi.object().pattern(/.*/, Joi.string().required())
   })
   .required();
+
+/**
+ * Convert entity (rest hook or rest hook history), JSON string fields are parsed to object fields.
+ * @param {Object} entity the entity to convert
+ * @returns {Object} the converted entity
+ */
+function convertEntity(entity) {
+  const obj = entity.toJSON ? entity.toJSON() : entity;
+  if (obj.headers) {
+    obj.headers = obj.headers.trim().length === 0 ? {} : JSON.parse(obj.headers);
+  }
+  if (obj.requestData) {
+    obj.requestData = obj.requestData.trim().length === 0 ? {} : JSON.parse(obj.requestData);
+  }
+  return obj;
+}
 
 /**
  * Get all hooks.
@@ -39,13 +53,13 @@ const hookSchema = Joi.object()
 function* getAllHooks(query) {
   const filter = {};
   if (query.owner) {
-    filter.owner = query.owner;
+    filter.owner = { eq: query.owner };
   }
-  const total = yield RestHook.count(filter);
-  const hooks = yield RestHook.find(filter)
-    .sort('_id')
-    .skip(query.offset)
-    .limit(query.limit);
+  let entities = yield helper.findAll('RestHook', filter);
+  entities = _.sortBy(entities, ['id']);
+  const total = entities.length;
+  let hooks = entities.slice(query.offset, query.offset + query.limit);
+  hooks = _.map(hooks, (hook) => convertEntity(hook));
   return { total, offset: query.offset, limit: query.limit, hooks };
 }
 
@@ -59,8 +73,8 @@ getAllHooks.schema = {
     limit: Joi.number()
       .integer()
       .min(1)
-      .default(10),
-  }),
+      .default(10)
+  })
 };
 
 /**
@@ -88,7 +102,7 @@ function* confirmEndpoint(endpoint) {
   try {
     const res = yield axios.post(endpoint, '', {
       headers: { 'x-hook-secret': secret },
-      timeout: Number(config.AXIOS_TIMEOUT),
+      timeout: Number(config.AXIOS_TIMEOUT)
     });
 
     if (_.isPlainObject(res.data)) {
@@ -115,12 +129,11 @@ function* createHook(data, user) {
   console.log(user);
   yield validateUserTopic(user, data.topic);
 
-  if (data.filter && data.filter.trim().length === 0) data.filter = null;
+  if (data.headers) data.headers = JSON.stringify(data.headers);
+  if (!data.filter || data.filter.trim().length === 0) data.filter = undefined;
+  if (!data.description || data.description.trim().length === 0) data.description = undefined;
 
-  const hook = yield RestHook.findOne({
-    topic: data.topic,
-    endpoint: data.endpoint,
-  });
+  const hook = yield helper.findOne('RestHook', { topic: { eq: data.topic }, endpoint: { eq: data.endpoint } });
   if (hook) {
     throw new ConflictError('The hook is already defined.');
   }
@@ -131,13 +144,29 @@ function* createHook(data, user) {
 
   // eslint-disable-next-line no-console
   console.log(data);
-  return yield RestHook.create(data);
+  const createdHook = yield helper.create('RestHook',
+    _.assignIn({ id: uuid(), createdAt: new Date().toISOString() }, data));
+  return convertEntity(createdHook);
 }
 
 createHook.schema = {
   data: hookSchema,
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
+
+/**
+ * Get raw hook in db.
+ * @param {String} id the hook id
+ * @param {Object} user the current user
+ * @returns {Object} the hook
+ */
+function* getRawHook(id, user) {
+  const hook = yield helper.getById('RestHook', id);
+  if (!user.isAdmin && hook.owner !== user.handle) {
+    throw new ForbiddenError("You can not access other user's hook.");
+  }
+  return hook;
+}
 
 /**
  * Get hook.
@@ -146,16 +175,13 @@ createHook.schema = {
  * @returns {Object} the hook
  */
 function* getHook(id, user) {
-  const hook = yield helper.ensureExists(RestHook, id);
-  if (!user.isAdmin && hook.owner !== user.handle) {
-    throw new ForbiddenError("You can not access other user's hook.");
-  }
-  return hook;
+  const hook = yield getRawHook(id, user);
+  return convertEntity(hook);
 }
 
 getHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -168,17 +194,14 @@ getHook.schema = {
 function* updateHook(id, data, user) {
   yield validateUserTopic(user, data.topic);
 
-  if (data.filter && data.filter.trim().length === 0) data.filter = null;
+  if (data.headers) data.headers = JSON.stringify(data.headers);
 
-  const hk = yield RestHook.findOne({
-    topic: data.topic,
-    endpoint: data.endpoint,
-  });
-  if (hk && String(hk._id) !== id) {
+  const hk = yield helper.findOne('RestHook', { topic: { eq: data.topic }, endpoint: { eq: data.endpoint } });
+  if (hk && hk.id !== id) {
     throw new ConflictError('The hook is already defined.');
   }
 
-  const hook = yield getHook(id, user);
+  const hook = yield getRawHook(id, user);
 
   // if endpoint is updated, then it needs to be re-confirmed
   if (data.endpoint !== hook.endpoint) {
@@ -186,22 +209,23 @@ function* updateHook(id, data, user) {
   }
 
   _.assignIn(hook, data);
-  if (!data.description) {
-    hook.description = null;
+  if (!data.description || data.description.trim().length === 0) {
+    hook.description = undefined;
   }
-  if (!data.filter) {
-    hook.filter = null;
+  if (!data.filter || data.filter.trim().length === 0) {
+    hook.filter = undefined;
   }
   if (!data.headers) {
-    hook.headers = null;
+    hook.headers = undefined;
   }
-  return yield hook.save();
+  const updatedHook = yield helper.update(hook, { updatedAt: new Date().toISOString() });
+  return convertEntity(updatedHook);
 }
 
 updateHook.schema = {
   id: Joi.string().required(),
   data: hookSchema,
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -210,13 +234,13 @@ updateHook.schema = {
  * @param {Object} user the current user
  */
 function* deleteHook(id, user) {
-  const hook = yield getHook(id, user);
-  yield hook.remove();
+  const hook = yield getRawHook(id, user);
+  yield hook.delete();
 }
 
 deleteHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -226,7 +250,7 @@ deleteHook.schema = {
  * @returns {Boolean} whether the hook should be called
  */
 function filterHook(hook, message) {
-  if (!hook.filter) {
+  if (!hook.filter || hook.filter.trim().length === 0) {
     // there is no filter, then call the hook
     return true;
   }
@@ -250,15 +274,17 @@ function filterHook(hook, message) {
  */
 function* notifyHook(hook, message) {
   const history = {
-    hookId: hook._id,
-    requestData: message,
+    id: uuid(),
+    hookId: hook.id,
+    requestData: message ? JSON.stringify(message) : null,
+    createdAt: new Date().toISOString()
   };
   // call hook endpoint
   try {
     const res = yield axios.post(hook.endpoint, message, {
-      headers: hook.headers || {},
+      headers: hook.headers ? JSON.parse(hook.headers) : {},
       timeout: Number(config.AXIOS_TIMEOUT),
-      validateStatus: () => true,
+      validateStatus: () => true
     });
     history.responseStatus = res.status;
     if (res.status < 200 || res.status >= 300) {
@@ -272,13 +298,14 @@ function* notifyHook(hook, message) {
 
   try {
     // remove old histories
-    const histories = yield RestHookHistory.find({ hookId: hook._id }).sort('-createdAt');
-    for (let i = Number(config.HOOK_HISTORY_COUNT) - 1; i < histories.length; i += 1) {
-      yield histories[i].remove();
+    let histories = yield helper.findAll('RestHookHistory', { hookId: { eq: hook.id } });
+    histories = _.sortBy(histories, ['createdAt']);
+    for (let i = 0; i <= histories.length - Number(config.HOOK_HISTORY_COUNT); i += 1) {
+      yield histories[i].delete();
     }
 
     // save history
-    yield RestHookHistory.create(history);
+    yield helper.create('RestHookHistory', history);
   } catch (e) {
     logger.error(e);
   }
@@ -290,7 +317,7 @@ function* notifyHook(hook, message) {
  */
 function* notifyHooks(message) {
   // find confirmed hooks of message topic
-  const hooks = yield RestHook.find({ topic: message.topic, confirmed: true });
+  const hooks = yield helper.findAll('RestHook', { topic: { eq: message.topic }, confirmed: { eq: true } });
   // notify each hook in parallel
   yield _.map(hooks, hook => (filterHook(hook, message) ? notifyHook(hook, message) : null));
 }
@@ -312,14 +339,15 @@ function* notifyHooks(message) {
  * @returns {Object} the updated hook
  */
 function* confirmHook(id, user) {
-  const hook = yield getHook(id, user);
+  const hook = yield getRawHook(id, user);
   hook.confirmed = yield confirmEndpoint(hook.endpoint);
-  return yield hook.save();
+  const updatedHook = yield helper.update(hook, { updatedAt: new Date().toISOString() });
+  return convertEntity(updatedHook);
 }
 
 confirmHook.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 /**
@@ -330,16 +358,18 @@ confirmHook.schema = {
  */
 function* getHookHistories(id, user) {
   // ensure the hook exists and user can access it
-  yield getHook(id, user);
+  yield getRawHook(id, user);
   // find histories of given hook id
+  let histories = yield helper.findAll('RestHookHistory', { hookId: { eq: id } });
   // sort by createdAt in descending order, so that latest histories will be shown first
-  const histories = yield RestHookHistory.find({ hookId: id }).sort('-createdAt');
-  return histories;
+  histories = _.sortBy(histories, ['createdAt']);
+  _.reverse(histories);
+  return _.map(histories, (h) => convertEntity(h));
 }
 
 getHookHistories.schema = {
   id: Joi.string().required(),
-  user: Joi.object().required(),
+  user: Joi.object().required()
 };
 
 // Exports
@@ -351,5 +381,5 @@ module.exports = {
   deleteHook,
   notifyHooks,
   confirmHook,
-  getHookHistories,
+  getHookHistories
 };

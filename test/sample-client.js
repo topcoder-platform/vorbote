@@ -59,7 +59,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => { // eslint-disable-line
   logger.logFullError(err);
   res.status(500).json({
-    error: err.message,
+    error: err.message
   });
 });
 

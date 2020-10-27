@@ -1,19 +1,37 @@
 /**
- * This defines Role Topic model.
+ * This defines RoleTopic model.
  */
-'use strict';
 
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const config = require('config');
+const dynamoose = require('dynamoose');
+
+const Schema = dynamoose.Schema;
 
 const schema = new Schema({
-  role: { type: String, required: true },
-  topic: { type: String, required: true },
-}, {
-  timestamps: true,
+  id: {
+    type: String,
+    hashKey: true,
+    required: true
+  },
+  role: {
+    type: String,
+    required: true
+  },
+  topic: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: String,
+    required: true
+  },
+  updatedAt: {
+    type: String,
+    required: false
+  }
+},
+{
+  throughput: { read: config.DYNAMODB.AWS_READ_UNITS, write: config.DYNAMODB.AWS_WRITE_UNITS }
 });
-
-schema.index({ role: 1 });
-schema.index({ role: 1, topic: 1 }, { unique: true });
 
 module.exports = schema;

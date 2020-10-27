@@ -1,25 +1,62 @@
 /**
- * This defines Rest Hook model.
+ * This defines RestHook model.
  */
-'use strict';
 
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const config = require('config');
+const dynamoose = require('dynamoose');
+
+const Schema = dynamoose.Schema;
 
 const schema = new Schema({
-  name: { type: String, required: true },
-  description: String,
-  topic: { type: String, required: true },
-  endpoint: { type: String, required: true },
-  owner: { type: String, required: true },
-  filter: String,
-  confirmed: Boolean,
-  headers: Object,
-}, {
-  timestamps: true,
+  id: {
+    type: String,
+    hashKey: true,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: false
+  },
+  topic: {
+    type: String,
+    required: true
+  },
+  endpoint: {
+    type: String,
+    required: true
+  },
+  owner: {
+    type: String,
+    required: true
+  },
+  filter: {
+    type: String,
+    required: false
+  },
+  confirmed: {
+    type: Boolean,
+    required: false
+  },
+  // headers object is stored as JSON string
+  headers: {
+    type: String,
+    required: false
+  },
+  createdAt: {
+    type: String,
+    required: true
+  },
+  updatedAt: {
+    type: String,
+    required: false
+  }
+},
+{
+  throughput: { read: config.DYNAMODB.AWS_READ_UNITS, write: config.DYNAMODB.AWS_WRITE_UNITS }
 });
-
-schema.index({ topic: 1 });
-schema.index({ topic: 1, endpoint: 1 }, { unique: true });
 
 module.exports = schema;

@@ -1,20 +1,42 @@
 /**
- * This defines Rest Hook History model.
+ * This defines RestHookHistory model.
  */
-'use strict';
 
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const ObjectId = Schema.Types.ObjectId;
+const config = require('config');
+const dynamoose = require('dynamoose');
+
+const Schema = dynamoose.Schema;
 
 const schema = new Schema({
-  hookId: { type: ObjectId, ref: 'RestHook', required: true },
-  requestData: Object,
-  responseStatus: { type: Number, required: true },
-}, {
-  timestamps: true,
+  id: {
+    type: String,
+    hashKey: true,
+    required: true
+  },
+  hookId: {
+    type: String,
+    required: true
+  },
+  // requestData object is stored as JSON string
+  requestData: {
+    type: String,
+    required: false
+  },
+  responseStatus: {
+    type: Number,
+    required: true
+  },
+  createdAt: {
+    type: String,
+    required: true
+  },
+  updatedAt: {
+    type: String,
+    required: false
+  }
+},
+{
+  throughput: { read: config.DYNAMODB.AWS_READ_UNITS, write: config.DYNAMODB.AWS_WRITE_UNITS }
 });
-
-schema.index({ hookId: 1 });
 
 module.exports = schema;

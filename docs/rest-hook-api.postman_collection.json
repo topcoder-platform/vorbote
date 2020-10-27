@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9bea5d49-ed47-4827-b1de-738a682daa46",
+		"_postman_id": "ddfa8e83-ab21-4f8f-9c61-8db0ee4d937d",
 		"name": "rest-hook-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -19,10 +19,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/hooks?offset=0&limit=10",
 					"host": [
@@ -76,7 +72,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5555/callback\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
+					"raw": "{\n\t\"name\": \"test123123\",\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5555/callback\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
 				},
 				"url": {
 					"raw": "{{URL}}/hooks",
@@ -106,7 +102,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5555/callback\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
+					"raw": "{\n\t\"name\": \"abcabcxyz\",\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5555/callback\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
 				},
 				"url": {
 					"raw": "{{URL}}/hooks/{{HOOK_ID}}",
@@ -135,10 +131,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/hooks/{{HOOK_ID}}",
 					"host": [
@@ -255,10 +247,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/topics",
 					"host": [
@@ -285,10 +273,6 @@
 						"value": "Bearer {{NON_ADMIN_TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/topics",
 					"host": [
@@ -315,10 +299,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/roletopics?offset=0&limit=10",
 					"host": [
@@ -417,5 +397,6 @@
 			},
 			"response": []
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

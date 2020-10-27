@@ -5,22 +5,30 @@
 
 const expect = require('chai').expect;
 let request = require('supertest');
+const co = require('co');
+const helper = require('../src/common/helper');
 const app = require('../src/app');
-const RestHook = require('../src/models').RestHook;
 const testConfig = require('./testConfig');
 const RestHookService = require('../src/services/RestHookService');
 
 request = request(app);
 
 describe('REST Hook API Tests', () => {
+  function* clearData() {
+    const hooks = yield helper.findAll('RestHook', {});
+    for (const hook of hooks) {
+      yield hook.delete();
+    }
+  }
+
   before((done) => {
-    RestHook.remove({})
+    co(clearData())
       .then(() => done())
       .catch(done);
   });
 
   after((done) => {
-    RestHook.remove({})
+    co(clearData())
       .then(() => done())
       .catch(done);
   });
@@ -49,7 +57,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: 'value1' },
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(200)
       .end((err, res) => {
@@ -76,7 +84,7 @@ describe('REST Hook API Tests', () => {
       originator: 'originator',
       timestamp: new Date(),
       'mime-type': 'application/json',
-      payload: { id: 123 },
+      payload: { id: 123 }
     });
     done();
   });
@@ -89,7 +97,7 @@ describe('REST Hook API Tests', () => {
         description: 'desc',
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(409, done);
   });
@@ -101,7 +109,7 @@ describe('REST Hook API Tests', () => {
         name: 'test',
         topic: 'topic',
         endpoint: 123,
-        handle: 'test',
+        handle: 'test'
       })
       .expect(400, done);
   });
@@ -113,7 +121,7 @@ describe('REST Hook API Tests', () => {
         name: 'test-name',
         topic: 'topic2',
         endpoint: 'http://test.com/success',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(403, done);
   });
@@ -125,7 +133,7 @@ describe('REST Hook API Tests', () => {
         description: 'desc',
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(400, done);
   });
@@ -138,7 +146,7 @@ describe('REST Hook API Tests', () => {
         description: 'desc',
         topic: { test: 'topic1' },
         endpoint: 'http://test.com/success',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(400, done);
   });
@@ -152,7 +160,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: ['value1'] },
         topic: 'test',
         endpoint: 'http://test.com/success',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(400, done);
   });
@@ -164,7 +172,7 @@ describe('REST Hook API Tests', () => {
         name: 'test-name',
         description: 'desc',
         topic: 'topic1',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(400, done);
   });
@@ -177,7 +185,7 @@ describe('REST Hook API Tests', () => {
         description: 'desc',
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: { invalid: 'abc' },
+        filter: { invalid: 'abc' }
       })
       .expect(400, done);
   });
@@ -239,7 +247,7 @@ describe('REST Hook API Tests', () => {
         headers: { header2: 'value2' },
         topic: 'topic2',
         endpoint: 'http://test.com/success',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(200)
       .end((err, res) => {
@@ -266,7 +274,7 @@ describe('REST Hook API Tests', () => {
         name: 'test',
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(403, done);
   });
@@ -277,7 +285,7 @@ describe('REST Hook API Tests', () => {
       .send({
         name: 'test',
         topic: 'topic1',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(400, done);
   });
@@ -289,7 +297,7 @@ describe('REST Hook API Tests', () => {
         name: 'test123456789012345678901234567890123456789012345678901234567890',
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(400, done);
   });
@@ -302,7 +310,7 @@ describe('REST Hook API Tests', () => {
         description: [123],
         topic: 'topic1',
         endpoint: 'http://test.com/success',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(400, done);
   });
@@ -339,7 +347,7 @@ describe('REST Hook API Tests', () => {
         headers: { header3: 'value3' },
         topic: 'topic1',
         endpoint: 'http://test.com/error',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(200)
       .end((err, res) => {
@@ -395,7 +403,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: 'value1' },
         topic: 'topic3',
         endpoint: 'http://test.com/unconfirmed',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(200)
       .end((err, res) => {
@@ -424,7 +432,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: 'value1' },
         topic: 'topic3',
         endpoint: 'http://test.com/late',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(200)
       .end((err, res) => {
@@ -453,7 +461,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: 'value1' },
         topic: 'topic3',
         endpoint: 'http://test.com/not-found',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(200)
       .end((err, res) => {
@@ -482,7 +490,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: 'value1' },
         topic: 'topic3',
         endpoint: 'http://test.com/error',
-        filter: '1+4 > 3',
+        filter: '1+4 > 3'
       })
       .expect(200)
       .end((err, res) => {
@@ -511,7 +519,7 @@ describe('REST Hook API Tests', () => {
         headers: { header1: 'value1' },
         topic: 'topic3',
         endpoint: 'http://test.com/error',
-        filter: 'true',
+        filter: 'true'
       })
       .expect(409, done);
   });
@@ -559,7 +567,7 @@ describe('REST Hook API Tests', () => {
       .send({
         name: 'test',
         topic: 'topic2',
-        endpoint: 'http://test.com/success',
+        endpoint: 'http://test.com/success'
       })
       .expect(404, done);
   });

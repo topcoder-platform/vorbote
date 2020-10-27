@@ -4,62 +4,62 @@ module.exports = {
   '/hooks': {
     get: {
       controller: 'RestHookController',
-      method: 'getAllHooks',
+      method: 'getAllHooks'
     },
     post: {
       controller: 'RestHookController',
-      method: 'createHook',
-    },
+      method: 'createHook'
+    }
   },
   '/hooks/:id': {
     get: {
       controller: 'RestHookController',
-      method: 'getHook',
+      method: 'getHook'
     },
     put: {
       controller: 'RestHookController',
-      method: 'updateHook',
+      method: 'updateHook'
     },
     delete: {
       controller: 'RestHookController',
-      method: 'deleteHook',
-    },
+      method: 'deleteHook'
+    }
   },
   '/hooks/:id/histories': {
     get: {
       controller: 'RestHookController',
-      method: 'getHookHistories',
-    },
+      method: 'getHookHistories'
+    }
   },
   '/hooks/:id/confirm': {
     post: {
       controller: 'RestHookController',
-      method: 'confirmHook',
-    },
+      method: 'confirmHook'
+    }
   },
   '/topics': {
     get: {
       controller: 'RoleTopicController',
-      method: 'getTopics',
-    },
+      method: 'getTopics'
+    }
   },
   '/roletopics': {
     get: {
       controller: 'RoleTopicController',
       method: 'getRoleTopics',
-      admin: true,
+      admin: true
     },
     post: {
       controller: 'RoleTopicController',
       method: 'create',
-      admin: true,
-    },
+      admin: true
+    }
   },
   '/roletopics/:id': {
     delete: {
       controller: 'RoleTopicController',
       method: 'remove',
-      admin: true,
-    },
-  },
+      admin: true
+    }
+  }
 };

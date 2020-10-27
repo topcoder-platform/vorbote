@@ -5,21 +5,29 @@
 
 const expect = require('chai').expect;
 let request = require('supertest');
+const co = require('co');
+const helper = require('../src/common/helper');
 const app = require('../src/app');
-const RoleTopic = require('../src/models').RoleTopic;
 const testConfig = require('./testConfig');
 
 request = request(app);
 
 describe('Role Topic API Tests', () => {
+  function* clearData() {
+    const rts = yield helper.findAll('RoleTopic', {});
+    for (const rt of rts) {
+      yield rt.delete();
+    }
+  }
+
   before((done) => {
-    RoleTopic.remove({})
+    co(clearData())
       .then(() => done())
       .catch(done);
   });
 
   after((done) => {
-    RoleTopic.remove({})
+    co(clearData())
       .then(() => done())
       .catch(done);
   });

@@ -53,5 +53,5 @@ module.exports = {
   getTopics,
   getRoleTopics,
   create,
-  remove,
+  remove
 };
