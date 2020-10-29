@@ -7,7 +7,7 @@ import RestHooks from './RestHooks';
 import AddHook from './AddHook';
 import UpdateHook from './UpdateHook';
 import RoleTopics from './RoleTopics';
-import { getFreshToken, configureConnector, decodeToken } from './services/tc-auth';
+import { getFreshToken, configureConnector, decodeToken } from '@topcoder-platform/tc-auth-lib';
 
 class App extends Component {
   constructor() {
