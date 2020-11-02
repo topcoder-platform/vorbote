@@ -7,7 +7,6 @@ const co = require('co');
 const logger = require('../common/logger');
 const helper = require('../common/helper');
 const RestHook = require('../mongo-models').RestHook;
-const RestHookHistory = require('../mongo-models').RestHookHistory;
 const RoleTopic = require('../mongo-models').RoleTopic;
 
 logger.info('Migrate data from MongoDB to DynamoDB.');
@@ -22,15 +21,10 @@ function convertEntity(entity) {
   if (obj.updatedAt) {
     obj.updatedAt = obj.updatedAt.toISOString();
   }
-  if (obj.hookId) {
-    obj.hookId = String(obj.hookId);
-  }
-  if (obj.requestData) {
-    obj.requestData = JSON.stringify(obj.requestData);
-  }
-  if (obj.headers) {
-    obj.headers = JSON.stringify(obj.headers);
-  }
+  obj.confirmed = true
+  obj.name = obj.handle
+  obj.owner = obj.handle
+  delete obj.handle
   return obj;
 }
 
@@ -46,12 +40,6 @@ function* migrateData() {
   const hooks = yield RestHook.find({});
   for (const hook of hooks) {
     yield helper.create('RestHook', convertEntity(hook));
-  }
-  // migrate rest hook histories
-  logger.info('Migrating Rest hook history...')
-  const histories = yield RestHookHistory.find({});
-  for (const h of histories) {
-    yield helper.create('RestHookHistory', convertEntity(h));
   }
 }
 
