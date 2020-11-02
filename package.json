@@ -40,7 +40,6 @@
     "get-parameter-names": "^0.3.0",
     "joi": "^9.0.4",
     "lodash": "^4.17.15",
-    "mongoose": "^5.7.0",
     "no-kafka": "^3.4.3",
     "sandbox.js": "^2.0.2",
     "tc-auth-lib": "github:topcoder-platform/tc-auth-lib#1.0.1",
