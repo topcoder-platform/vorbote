@@ -25,6 +25,20 @@ const API = {
     });
   },
 
+  confirmHook: (id, cb) => {
+    superagent
+      .post(`${config.API_URL}/hooks/${id}/confirm`)
+      .set('Authorization', `Bearer ${getToken()}`)
+      .timeout(Number(config.CONFIRM_HOOK_TIMEOUT))
+      .end((err, res) => {
+      if (err) {
+        cb({ confirmed: false });
+      } else {
+        cb({ confirmed: res.body.confirmed });
+      }
+    });
+  },
+
   createHook: (data, cb) => {
     superagent.post(`${config.API_URL}/hooks`).set('Authorization', `Bearer ${getToken()}`).send(data).end((err, res) => {
       if (err) {
@@ -51,6 +65,16 @@ const API = {
         alert(`Failed to delete hook. ${ err }`);
       } else {
         cb();
+      }
+    });
+  },
+
+  getHookHistories: (id, cb) => {
+    superagent.get(`${config.API_URL}/hooks/${id}/histories`).set('Authorization', `Bearer ${getToken()}`).end((err, res) => {
+      if (err) {
+        alert(`Failed to get REST hook histories. ${ err }`);
+      } else {
+        cb(res.body);
       }
     });
   },

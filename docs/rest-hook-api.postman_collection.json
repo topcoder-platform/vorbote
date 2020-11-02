@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "82f4c3d6-4081-409c-8b92-8dba516aec72",
+		"_postman_id": "ddfa8e83-ab21-4f8f-9c61-8db0ee4d937d",
 		"name": "rest-hook-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -19,10 +19,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/hooks?offset=0&limit=10",
 					"host": [
@@ -47,6 +43,21 @@
 		},
 		{
 			"name": "create hook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0aa109ce-8d80-4b7d-b064-21b4d1d9c0c1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.environment.set(\"HOOK_ID\", pm.response.json().id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -61,27 +72,15 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
+					"raw": "{\n\t\"name\": \"test123123\",\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5555/callback\",\n\t\"filter\": \"message.originator == 'ap-challenge-api' && message['mime-type'] == 'application/json' || 2 + 3 < 4\"\n}"
 				},
 				"url": {
-					"raw": "{{URL}}/hooks?",
+					"raw": "{{URL}}/hooks",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -103,28 +102,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5000/callback\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
+					"raw": "{\n\t\"name\": \"abcabcxyz\",\n\t\"topic\": \"challenge.notification.create\",\n\t\"endpoint\": \"http://localhost:5555/callback\",\n\t\"filter\": \"message.originator == 'not-found'\"\n}"
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5b4b59c23cb03613cab6b442?",
+					"raw": "{{URL}}/hooks/{{HOOK_ID}}",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5b4b59c23cb03613cab6b442"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
+						"{{HOOK_ID}}"
 					]
 				}
 			},
@@ -144,30 +131,46 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{URL}}/hooks/5b4b59c23cb03613cab6b442?",
+					"raw": "{{URL}}/hooks/{{HOOK_ID}}",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5b4b59c23cb03613cab6b442"
+						"{{HOOK_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "confirm hook",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/hooks/{{HOOK_ID}}/confirm",
+					"host": [
+						"{{URL}}"
 					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
+					"path": [
+						"hooks",
+						"{{HOOK_ID}}",
+						"confirm"
 					]
 				}
 			},
@@ -192,25 +195,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/hooks/5b4b59c23cb03613cab6b442?",
+					"raw": "{{URL}}/hooks/{{HOOK_ID}}",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"hooks",
-						"5b4b59c23cb03613cab6b442"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
+						"{{HOOK_ID}}"
 					]
 				}
 			},
@@ -231,24 +222,12 @@
 					"raw": "{\n\t\"topic\": \"challenge.notification.create\",\n\t\"originator\": \"ap-challenge-api\",\n\t\"mime-type\": \"application/json\",\n\t\"timestamp\": \"2018-02-16T00:00:00\",\n\t\"payload\": {\n\t\t\"id\": 123,\n\t\t\"name\": \"name\"\n\t}\n}"
 				},
 				"url": {
-					"raw": "{{CLIENT_URL}}/callback?",
+					"raw": "{{CLIENT_URL}}/callback",
 					"host": [
 						"{{CLIENT_URL}}"
 					],
 					"path": [
 						"callback"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -268,10 +247,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/topics",
 					"host": [
@@ -298,10 +273,6 @@
 						"value": "Bearer {{NON_ADMIN_TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/topics",
 					"host": [
@@ -328,10 +299,6 @@
 						"value": "Bearer {{TOKEN}}"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{URL}}/roletopics?offset=0&limit=10",
 					"host": [
@@ -356,6 +323,21 @@
 		},
 		{
 			"name": "create role topic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "85a9afca-2a71-4343-90b3-6b976ce6ab6b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.environment.set(\"ROLE_TOPIC_ID\", pm.response.json().id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -379,18 +361,6 @@
 					],
 					"path": [
 						"roletopics"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
 					]
 				}
 			},
@@ -415,29 +385,18 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/roletopics/5b4b59f23cb03613cab6b443",
+					"raw": "{{URL}}/roletopics/{{ROLE_TOPIC_ID}}",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
 						"roletopics",
-						"5b4b59f23cb03613cab6b443"
-					],
-					"query": [
-						{
-							"key": "type",
-							"value": "notifications.connect.project.updated",
-							"disabled": true
-						},
-						{
-							"key": "read",
-							"value": "false",
-							"disabled": true
-						}
+						"{{ROLE_TOPIC_ID}}"
 					]
 				}
 			},
 			"response": []
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

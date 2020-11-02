@@ -1,36 +1,3 @@
-table, th, td {
-  border: 1px solid black;
-}
-
-button {
-  border: 1px solid blue;
-  border-radius: 5px;
-  margin: 5px;
-}
-
-.RoleTopicsTable {
-  margin-top: 10px;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.CurrentPage {
-  background-color: #9999FF;
-}
-
-.Row {
-  margin: 10px;
-}
-
-.Label {
-  display: inline-block;
-}
-
-input {
-  width: 150px;
-}
-
-.AddRoleTopicBtn {
-  margin-left: 30px;
+:local(.pagination) {
+  margin-bottom: 1.5rem;
 }

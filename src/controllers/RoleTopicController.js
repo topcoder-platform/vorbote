@@ -13,7 +13,7 @@ const RoleTopicService = require('../services/RoleTopicService');
 function* getTopics(req, res) {
   if (req.user.isAdmin) {
     // for admin, get all topics
-    res.json(req.topics);
+    res.json(req.topics || []);
   } else {
     // for non-admin, get allowed topics for roles of the current user
     res.json(yield RoleTopicService.getTopics(req.user.roles));
@@ -53,5 +53,5 @@ module.exports = {
   getTopics,
   getRoleTopics,
   create,
-  remove,
+  remove
 };

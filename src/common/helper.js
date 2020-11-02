@@ -6,7 +6,8 @@
 const _ = require('lodash');
 const co = require('co');
 const util = require('util');
-const NotFoundError = require('./errors').NotFoundError;
+const errors = require('./errors');
+const models = require('../models');
 
 /**
  * Wrap generator function to standard express function
@@ -41,34 +42,132 @@ function autoWrapExpress(obj) {
 }
 
 /**
- * Ensure entity exists for given criteria. Throw error if no result.
- * @param {Object} Model the mongoose model to query
- * @param {Object|String} criteria the criteria (if object) or id (if string)
+ * Get Data by model id
+ * @param {Object} modelName The dynamoose model name
+ * @param {String} id The id value
+ * @returns the entity of given id
  */
-function* ensureExists(Model, criteria) {
-  let query;
-  let byId = true;
-  if (_.isObject(criteria)) {
-    byId = false;
-    query = Model.findOne(criteria);
-  } else {
-    query = Model.findById(criteria);
-  }
-  const result = yield query;
-  if (!result) {
-    let msg;
-    if (byId) {
-      msg = util.format('%s not found with id: %s', Model.modelName, criteria);
-    } else {
-      msg = util.format('%s not found with criteria: %j', Model.modelName, criteria);
+function* getById (modelName, id) {
+  return yield new Promise((resolve, reject) => {
+    models[modelName].query('id').eq(id).exec((err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      if (result.length > 0) {
+        return resolve(result[0]);
+      } else {
+        return reject(new errors.NotFoundError(`${modelName} with id: ${id} doesn't exist`));
+      }
+    });
+  });
+}
+
+/**
+ * Create item in database
+ * @param {Object} modelName The dynamoose model name
+ * @param {Object} data The create data object
+ * @returns created entity
+ */
+function* create (modelName, data) {
+  return yield new Promise((resolve, reject) => {
+    const dbItem = new models[modelName](data);
+    dbItem.save((err) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(dbItem);
+    });
+  });
+}
+
+/**
+ * Update item in database
+ * @param {Object} dbItem The Dynamo database item
+ * @param {Object} data The updated data object
+ * @returns updated entity
+ */
+function* update (dbItem, data) {
+  Object.keys(data).forEach((key) => {
+    dbItem[key] = data[key];
+  });
+  return yield new Promise((resolve, reject) => {
+    dbItem.save((err) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(dbItem);
+    });
+  });
+}
+
+/**
+ * Get data collection by scan parameters
+ * @param {Object} modelName The dynamoose model name
+ * @param {Object} scanParams The scan parameters object
+ * @param {Object} lastKey the last key of the previous scan, optional
+ * @returns scanned entities
+ */
+function* scan (modelName, scanParams, lastKey) {
+  return yield new Promise((resolve, reject) => {
+    let op = models[modelName].scan(scanParams || {});
+    if (lastKey) {
+      op = op.startAt(lastKey);
     }
-    throw new NotFoundError(msg);
+    op.exec((err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(result.count === 0 ? [] : result);
+    });
+  });
+}
+
+/**
+ * Find all matched entities.
+ * @param {Object} modelName The dynamoose model name
+ * @param {Object} criteria the criteria
+ * @returns found entities
+ */
+function* findAll (modelName, criteria) {
+  let result = [];
+  let lastKey = null;
+  for (;;) {
+    const entities = yield scan(modelName, criteria, lastKey);
+    if (!entities || entities.length === 0) {
+      break;
+    }
+    result = result.concat(entities);
+    if (!entities.lastKey) {
+      break;
+    }
+    lastKey = entities.lastKey;
   }
   return result;
+}
+
+/**
+ * Find one matched entity.
+ * @param {Object} modelName The dynamoose model name
+ * @param {Object} criteria the criteria
+ * @returns found entity, or null if not found
+ */
+function* findOne (modelName, criteria) {
+  const entities = yield findAll(modelName, criteria);
+  if (entities.length === 0) {
+    return null;
+  }
+  return entities[0];
 }
 
 module.exports = {
   wrapExpress,
   autoWrapExpress,
-  ensureExists,
+  getById,
+  create,
+  update,
+  findAll,
+  findOne
 };

@@ -16,7 +16,9 @@ const errors = require('./common/errors');
 const Kafka = require('no-kafka');
 const co = require('co');
 const RestHookService = require('./services/RestHookService');
-const decodeToken = require('@topcoder-platform/tc-auth-lib').decodeToken;
+const decodeToken = require('tc-auth-lib').decodeToken;
+
+global.atob  = require('atob');
 
 let currentConsumer = null;
 let currentTopics = [];
@@ -101,6 +103,12 @@ const authMiddleware = (req, res, next) => {
     logger.error(err);
     return next(new errors.UnauthorizedError('Authentication failed.'));
   }
+  if (!req.user.handle) {
+    req.user.handle = req.user['https://topcoder.com/handle'] || req.user['https://topcoder-dev.com/handle'];
+  }
+  if (!req.user.roles) {
+    req.user.roles = req.user['https://topcoder.com/roles'] || req.user['https://topcoder-dev.com/roles'];
+  }
   req.user.isAdmin = req.user.roles && _.indexOf(req.user.roles, config.TC_ADMIN_ROLE) >= 0;
   next();
 };
@@ -156,11 +164,11 @@ app.use((err, req, res, next) => { // eslint-disable-line
   if (err.isJoi) {
     res.json({
       error: 'Validation failed',
-      details: err.details,
+      details: err.details
     });
   } else {
     res.json({
-      error: err.message,
+      error: err.message
     });
   }
 });

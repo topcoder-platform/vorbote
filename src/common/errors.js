@@ -38,5 +38,5 @@ module.exports = {
   UnauthorizedError: _createError('UnauthorizedError', 401),
   ForbiddenError: _createError('ForbiddenError', 403),
   NotFoundError: _createError('NotFoundError', 404),
-  ConflictError: _createError('ConflictError', 409),
+  ConflictError: _createError('ConflictError', 409)
 };

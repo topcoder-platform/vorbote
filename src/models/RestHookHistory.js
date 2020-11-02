@@ -1,5 +1,5 @@
 /**
- * This defines RestHook model.
+ * This defines RestHookHistory model.
  */
 
 const config = require('config');
@@ -13,38 +13,18 @@ const schema = new Schema({
     hashKey: true,
     required: true
   },
-  name: {
+  hookId: {
     type: String,
     required: true
   },
-  description: {
+  // requestData object is stored as JSON string
+  requestData: {
     type: String,
     required: false
   },
-  topic: {
-    type: String,
+  responseStatus: {
+    type: Number,
     required: true
-  },
-  endpoint: {
-    type: String,
-    required: true
-  },
-  owner: {
-    type: String,
-    required: true
-  },
-  filter: {
-    type: String,
-    required: false
-  },
-  confirmed: {
-    type: Boolean,
-    required: false
-  },
-  // headers object is stored as JSON string
-  headers: {
-    type: String,
-    required: false
   },
   createdAt: {
     type: String,

@@ -1,32 +1,19 @@
-.App {
-  text-align: center;
+.svg:not(:root).svg-inline--fa {
+  overflow: visible;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.svg-inline--fa.fa-w-14 {
+  width: .875em;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -.125em;
 }
 
-.App-title {
-  font-size: 1.5em;
-}
-
-.logged-in-user, .logged-in-user a {
-  float: right;
-  color: white;
-}
-a, button {
- cursor: pointer;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.word-break {
+  word-break: break-all;
 }
