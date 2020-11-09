@@ -18,7 +18,7 @@ class RestHooks extends Component {
     this.state = {
       hooks: [],
       page: 1,
-      total: 0,
+      keys: [undefined],
       selectedFilter: '',
       loading: {}
     };
@@ -37,8 +37,14 @@ class RestHooks extends Component {
 
   browsePage(p) {
     const _self = this;
-    API.getAllHooks({ offset: (p - 1) * pageSize, limit: pageSize }, (res) => {
-      _self.setState({ hooks: res.hooks, total: res.total, page: p });
+    const keys = _self.state.keys
+    const index = Math.min(p, keys.length)
+    const lastKey = keys[index - 1]
+    API.getAllHooks({ lastKey, limit: pageSize }, (res) => {
+      if (res.lastKey) {
+        keys[index] = res.lastKey;
+      }
+      _self.setState({ hooks: res.hooks, keys, page: p });
     });
   }
 
@@ -49,7 +55,10 @@ class RestHooks extends Component {
 
     const _self = this;
     API.deleteHook(id, () => {
-      _self.browsePage(_self.state.page);
+      const { page, keys } = _self.state
+      const sliceKeys = keys.slice(0, page)
+      _self.setState({ keys: sliceKeys })
+      _self.browsePage(page);
     });
   }
 
@@ -78,8 +87,8 @@ class RestHooks extends Component {
   }
 
   render() {
-    const { hooks, page, total, selectedFilter, loading } = this.state;
-    let pageCount = Math.ceil(total / pageSize);
+    const { hooks, page, keys, selectedFilter, loading } = this.state;
+    let pageCount = keys.length;
     if (pageCount < 1) pageCount = 1;
     const pages = [];
     for (let i = 1; i <= pageCount; i += 1) pages.push(i);

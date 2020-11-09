@@ -55,21 +55,17 @@ function* getAllHooks(query) {
   if (query.owner) {
     filter.owner = { eq: query.owner };
   }
-  let entities = yield helper.findAll('RestHook', filter);
-  entities = _.sortBy(entities, ['id']);
-  const total = entities.length;
-  let hooks = entities.slice(query.offset, query.offset + query.limit);
-  hooks = _.map(hooks, (hook) => convertEntity(hook));
-  return { total, offset: query.offset, limit: query.limit, hooks };
+  let entities = yield helper.scan('RestHook', filter, query.lastKey, query.limit);
+  const hooks = _.map(entities, (hook) => convertEntity(hook));
+  return { lastKey: entities.lastKey, limit: query.limit, hooks };
 }
 
 getAllHooks.schema = {
   query: Joi.object().keys({
     owner: Joi.string(),
-    offset: Joi.number()
-      .integer()
-      .min(0)
-      .default(0),
+    lastKey: Joi.object().keys({
+      id: Joi.string().required()
+    }),
     limit: Joi.number()
       .integer()
       .min(1)
