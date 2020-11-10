@@ -13,8 +13,8 @@ const helper = require('../common/helper');
 const logger = require('../common/logger');
 const ConflictError = require('../common/errors').ConflictError;
 const ForbiddenError = require('../common/errors').ForbiddenError;
-const sandbox = require('sandbox.js');
 const RoleTopicService = require('./RoleTopicService');
+const { VM } = require('vm2')
 
 const hookSchema = Joi.object()
   .keys({
@@ -255,10 +255,13 @@ function filterHook(hook, message) {
     return true;
   }
 
-  const filterFunc = () => eval(__FILTER_CODE); // eslint-disable-line
+  const filterFunc = 'eval(__FILTER_CODE)';
   const context = { __FILTER_CODE: hook.filter, message };
   try {
-    return !!sandbox.runInSandbox(filterFunc, context);
+    const vm = new VM({
+      sandbox: context
+    })
+    return !!vm.run(filterFunc)
   } catch (e) {
     logger.error('Failed to filter hook.');
     logger.error(e);
