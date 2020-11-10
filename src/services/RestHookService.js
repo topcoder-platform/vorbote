@@ -260,7 +260,7 @@ function filterHook(hook, message) {
   try {
     return !!sandbox.runInSandbox(filterFunc, context);
   } catch (e) {
-    logger.error('Failed to filter hook.');
+    logger.error(`Failed to filter hook: ${hook.filter}`);
     logger.error(e);
     // return false to ignore the hook
     return false;
