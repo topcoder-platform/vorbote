@@ -20,7 +20,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{URL}}/hooks?offset=0&limit=10",
+					"raw": "{{URL}}/hooks?limit=10",
 					"host": [
 						"{{URL}}"
 					],
@@ -28,10 +28,6 @@
 						"hooks"
 					],
 					"query": [
-						{
-							"key": "offset",
-							"value": "0"
-						},
 						{
 							"key": "limit",
 							"value": "10"
@@ -300,7 +296,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{URL}}/roletopics?offset=0&limit=10",
+					"raw": "{{URL}}/roletopics?limit=10",
 					"host": [
 						"{{URL}}"
 					],
@@ -308,10 +304,6 @@
 						"roletopics"
 					],
 					"query": [
-						{
-							"key": "offset",
-							"value": "0"
-						},
 						{
 							"key": "limit",
 							"value": "10"

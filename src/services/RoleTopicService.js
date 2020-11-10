@@ -39,16 +39,15 @@ getTopics.schema = {
  * @returns {Object} hooks result
  */
 function* getRoleTopics(query) {
-  let entities = yield helper.findAll('RoleTopic', {});
-  entities = _.sortBy(entities, ['role', 'topic']);
-  const total = entities.length;
-  const roleTopics = entities.slice(query.offset, query.offset + query.limit);
-  return { total, offset: query.offset, limit: query.limit, roleTopics };
+  let entities = yield helper.scan('RoleTopic', {}, query.lastKey, query.limit);
+  return { lastKey: entities.lastKey, limit: query.limit, roleTopics: entities };
 }
 
 getRoleTopics.schema = {
   query: Joi.object().keys({
-    offset: Joi.number().integer().min(0).default(0),
+    lastKey: Joi.object().keys({
+      id: Joi.string().required()
+    }),
     limit: Joi.number().integer().min(1).default(10)
   })
 };

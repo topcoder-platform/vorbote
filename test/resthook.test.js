@@ -318,13 +318,13 @@ describe('REST Hook API Tests', () => {
   it('get all hooks 2', (done) => {
     request.get('/api/v1/hooks')
       .set('Authorization', `Bearer ${testConfig.TEST_ADMIN_TOKEN}`)
-      .query({ offset: 0, limit: 10 })
+      .query({ limit: 10 })
       .expect(200)
       .end((err, res) => {
         if (err) {
           return done(err);
         }
-        expect(res.body.total).to.equal(1);
+        expect(res.body.hooks.length).to.equal(1);
         expect(res.body.hooks[0].id).to.equal(hookId);
         expect(res.body.hooks[0].name).to.equal('test-name2');
         expect(res.body.hooks[0].description).to.equal('desc2');

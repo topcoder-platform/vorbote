@@ -107,13 +107,17 @@ function* update (dbItem, data) {
  * @param {Object} modelName The dynamoose model name
  * @param {Object} scanParams The scan parameters object
  * @param {Object} lastKey the last key of the previous scan, optional
+ * @param {Number} limit the limit count of scan, optional
  * @returns scanned entities
  */
-function* scan (modelName, scanParams, lastKey) {
+function* scan (modelName, scanParams, lastKey, limit) {
   return yield new Promise((resolve, reject) => {
     let op = models[modelName].scan(scanParams || {});
     if (lastKey) {
       op = op.startAt(lastKey);
+    }
+    if (limit) {
+      op = op.limit(limit);
     }
     op.exec((err, result) => {
       if (err) {
@@ -169,5 +173,6 @@ module.exports = {
   create,
   update,
   findAll,
-  findOne
+  findOne,
+  scan
 };

@@ -73,14 +73,14 @@ describe('Role Topic API Tests', () => {
 
   it('get all role topics 2', (done) => {
     request.get('/api/v1/roletopics')
-      .query({ offset: 0, limit: 10 })
+      .query({ limit: 10 })
       .set('Authorization', `Bearer ${testConfig.TEST_ADMIN_TOKEN}`)
       .expect(200)
       .end((err, res) => {
         if (err) {
           return done(err);
         }
-        expect(res.body.total).to.equal(1);
+        expect(res.body.roleTopics.length).to.equal(1);
         expect(res.body.roleTopics[0].id).to.equal(theId);
         expect(res.body.roleTopics[0].role).to.equal('copilot');
         expect(res.body.roleTopics[0].topic).to.equal('topic1');
@@ -160,7 +160,7 @@ describe('Role Topic API Tests', () => {
 
   it('get all role topics by non-admin', (done) => {
     request.get('/api/v1/roletopics')
-      .query({ offset: 0, limit: 10 })
+      .query({ limit: 10 })
       .set('Authorization', `Bearer ${testConfig.TEST_NON_ADMIN_TOKEN}`)
       .expect(403, done);
   });

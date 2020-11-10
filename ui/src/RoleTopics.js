@@ -14,7 +14,7 @@ class RoleTopics extends Component {
     this.state = {
       items: [],
       page: 1,
-      total: 0,
+      keys: [undefined],
     };
     this.deleteRoleTopic = this.deleteRoleTopic.bind(this);
     this.browsePage = this.browsePage.bind(this);
@@ -26,8 +26,14 @@ class RoleTopics extends Component {
 
   browsePage(p) {
     const _self = this;
-    API.getRoleTopics({ offset: (p - 1) * pageSize, limit: pageSize }, (res) => {
-      _self.setState({ items: res.roleTopics, total: res.total, page: p });
+    const keys = _self.state.keys
+    const index = Math.min(p, keys.length)
+    const lastKey = keys[index - 1]
+    API.getRoleTopics({ lastKey, limit: pageSize }, (res) => {
+      if (res.lastKey) {
+        keys[index] = res.lastKey;
+      }
+      _self.setState({ items: res.roleTopics, keys, page: p });
     });
   }
 
@@ -38,15 +44,18 @@ class RoleTopics extends Component {
 
     const _self = this;
     API.deleteRoleTopic(id, () => {
-      _self.browsePage(_self.state.page);
+      const { page, keys } = _self.state
+      const sliceKeys = keys.slice(0, page)
+      _self.setState({ keys: sliceKeys })
+      _self.browsePage(page);
     });
   }
 
   render() {
     if (!this.props.currentUser.isAdmin) return null;
 
-    const { items, page, total } = this.state;
-    let pageCount = Math.ceil(total / pageSize);
+    const { items, page, keys } = this.state;
+    let pageCount = keys.length;
     if (pageCount < 1) pageCount = 1;
     const pages = [];
     for (let i = 1; i <= pageCount; i += 1) pages.push(i);
