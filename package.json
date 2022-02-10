@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "atob": "^2.1.1",
-    "axios": "^0.19.0",
+    "axios": "^0.20.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.15.2",
     "co": "^4.6.0",
@@ -43,7 +43,7 @@
     "no-kafka": "^3.4.3",
     "tc-auth-lib": "github:topcoder-platform/tc-auth-lib#1.0.1",
     "uuid": "^3.3.3",
-    "vm2": "^3.9.2",
+    "vm2": "^3.9.6",
     "winston": "^2.2.0"
   },
   "engines": {
