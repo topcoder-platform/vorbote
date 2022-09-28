@@ -43,7 +43,7 @@
     "no-kafka": "^3.4.3",
     "tc-auth-lib": "github:topcoder-platform/tc-auth-lib#1.0.1",
     "uuid": "^3.3.3",
-    "vm2": "^3.9.2",
+    "vm2": "^3.9.11",
     "winston": "^2.2.0"
   },
   "engines": {
